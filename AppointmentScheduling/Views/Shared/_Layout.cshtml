@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+   
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<style>
+    main {
+        padding-left: 12%;
+        padding-right: 12%;
+        padding-bottom: 20px;
+    }
+
+    .nav-item {
+        color: white;
+        font-weight: bold;
+    }
+
+    footer {
+        background-color: teal;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+    }
+
+
+        footer a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+
+        footer .fa {
+            color: #fff;
+            margin: 0 5px;
+            font-size: 24px;
+        }
+
+    .menu-toggle {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        cursor: not-allowed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .menu-toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 4px;
+            background: #000;
+            box-shadow: 0 8px 0 #000, 0 -8px 0 #000;
+        }
+    /* profile menu */
+    .profile {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        text-align: end;
+    }
+
+        .profile h4 {
+            text-align: end;
+            font-family: var(--body-font);
+            line-height: 1;
+            margin-bottom: 4px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .profile .img-box {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+            .profile .img-box img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+    /* menu (the right one) */
+    .menu {
+        position: absolute;
+        top: calc(100% + 24px);
+        right: 16px;
+        width: 170px;
+        padding: 0 0 0 0;
+        min-height: 100px;
+        background: #fff;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
+        opacity: 0;
+        transform: translateY(-10px);
+        visibility: hidden;
+        transition: 300ms;
+    }
+
+        .menu.active {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+        /* menu links */
+        .menu ul {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            background: #fff;
+        }
+
+            .menu ul li {
+                list-style: none;
+            }
+
+                .menu ul li:hover {
+                    background: #eee;
+                }
+
+                .menu ul li a {
+                    text-decoration: none;
+                    color: #000;
+                    display: flex;
+                    align-items: center;
+                    padding: 15px 20px;
+                    gap: 4px;
+                }
+
+                    .menu ul li a i {
+                        font-size: 1.2em;
+                    }
+</style>
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: teal;height: 60px;">
+            <div class="container-fluid" style="color:white;font-weight:bold;">
+                <a class="navbar-brand" href="#"><span style="color:white;">Navbar</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/Patient/Index"><span style="color:white;">Home</span></a>
+                        </li>
+                       
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/Patient/Appointments"><span style="color:white;">Appointments</span></a>
+                        </li>
+                        <!--li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#"><span style="color:white;">Notifications</span></a>
+                        </li-->
+                    </ul>
+                </div>
+                   
+                    <div >
+                        <div class="profile">
+                            <div class="user">
+                            <h4>Welcome, <span id="username"></span></h4>
+                            </div>
+                            <div class="header_img img-box">
+                              
+                            <img id ="userImage" alt="User Image" />
+
+                            </div>
+                        </div>
+                        <div class="menu">
+                            <ul>
+                                <li>
+                                <a href="/Auth/UserProfile"><i class="bi bi-person"></i>&nbsp;Profile</a>
+                                </li>
+                                <li>
+                                <a href="/Auth/Logout"> <i class="bi bi-box-arrow-right"></i>&nbsp;Sign Out</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+               
+            </div>
+        </nav>
+
+
+    </header>
+    <div>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+    </div>
+        <main >
+            @RenderBody()
+        </main>
+  
+
+    <footer>
+        <div>
+            © 2024 [Company Name] |
+            <a href="#">About Us</a> |
+            <a href="#">Terms of Service</a> |
+            <a href="#">Privacy Policy</a>
+
+            <a href="#"><i class="fab fa-facebook-square"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script>
+
+        var myLink = document.querySelector('a[href="#"]');
+        myLink.addEventListener('click', function (e) {
+            e.preventDefault();
+        });
+        var myLink = document.querySelector('a[href="#"]');
+        myLink.addEventListener("click", function (e) {
+            e.preventDefault();
+        });
+        let profile = document.querySelector('.profile');
+        let menu = document.querySelector('.menu');
+        profile.onclick = function () {
+            menu.classList.toggle('active');
+        }
+        $(document).ready(function () {
+            $(".alert").alert();
+        });
+
+        $(document).ready(function () {
+            
+            $.ajax({
+                url: '/Auth/GetLoggedInUser',
+                type: 'GET',
+                success: function (data) {
+                    
+                    const loggedUser = JSON.parse(data);
+
+                    $('#username').text(loggedUser.UserName);
+                    $('#userImage').attr('src', loggedUser.ImagePath);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error occurred while retrieving logged-in user:', errorThrown);
+                }
+            });
+        });
+
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

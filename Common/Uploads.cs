@@ -1,0 +1,39 @@
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Common
+{
+    public class Uploads
+    {
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public Uploads(IWebHostEnvironment webHostEnvironment)
+        {
+            _webHostEnvironment = webHostEnvironment;
+        }
+
+        public async Task<string> UploadImage(IFormFile ImageFile)
+        {
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "ProfileImages");
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" +ImageFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(fileStream);
+                }
+
+                
+                return "/ProfileImages/" + uniqueFileName;
+            }
+            return "/ProfileImages/default-profile.png";
+        }
+    }
+}
