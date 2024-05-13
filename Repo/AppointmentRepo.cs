@@ -36,6 +36,11 @@ namespace Repo
             return appointments;
         }
 
+        public List<TblAppointment> GetDoctorAppointments(Guid doctorID)
+        {
+            var appointments = _context.TblAppointments.Where(appointment => appointment.DoctorId == doctorID).ToList();
+            return appointments;
+        }
         public TblAppointment? GetAppointment(Guid appointmentId)
         {
             return _context.TblAppointments.FirstOrDefault(appointment => appointment.AppointmentId == appointmentId);

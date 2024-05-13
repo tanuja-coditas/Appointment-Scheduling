@@ -4,6 +4,8 @@ using Services.AuthServices;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AppointmentScheduling.Controllers
 {
@@ -86,6 +88,23 @@ namespace AppointmentScheduling.Controllers
 
             };
             var json = JsonSerializer.Serialize(doctorsAvailability, options);
+            return Ok(json);
+        }
+
+        public IActionResult GetAppointmentsForWeek()
+        {
+            string jwtToken = HttpContext.Request.Cookies["JWTToken"];
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
+            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var username = usernameClaim.Value;
+            var appointments = _doctorServices.GetAppointmentsForWeek(username).ToArray();
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+
+            };
+            var json = JsonSerializer.Serialize(appointments, options);
             return Ok(json);
         }
     }

@@ -1,5 +1,242 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
 }
+<!DOCTYPE html>
+<html>
+<head>
+    <title>dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCjCk5z8O3bqFeh12Xv1t4+1p4flfl5Gw5+q" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="@Url.Content("~/css/doctor-styles.css")" rel="stylesheet">
+    <style>
+        .view {
+            border: none;
+            background-color: rgba(255,255,255,0.0);
+            float: right;
+            padding-left: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="greetings">
+            <div class="card" style="margin-top:100px;">
+                <h1>Good Morning, Dr. <span id="name"></span></h1>
+                <p>Have a nice day at work</p>
+            </div>
+        </div>
+        <div class="weekly-reports">
+            <h3>Weekly Reports</h3>
+            <div class="total-appointments">
+                <div class="card">
+                    <img class="weekly-item default" src="@Url.Content("~/Images/appointment.jpg")">
+                    <p>Total Appointments</p>
+                    <p style="font-size: larger;font-weight: bold;" id="total-appointments"></p>
+                </div>
+            </div>
+            <div class="appointments-breakdown card">
+                <div class="scheduled inline-container"><img class="appointments-breakdown-item" src="@Url.Content("~/Images/scheduled.jpg")"><p>Scheduled <span id="scheduled"></span></p></div>
+                <div class="cancelled inline-container"><img class="appointments-breakdown-item" src="@Url.Content("~/Images/cancelled.jpg")"><p>Cancelled  <span id="cancelled"></span></p></div>
+                <div class="completed inline-container"><img class="appointments-breakdown-item" src="@Url.Content("~/Images/completed.jpg")"><p>Completed  <span id="completed"></span></p></div>
+            </div>
+            <div class="total-patients">
+                <div class="card">
+                    <img class="weekly-item" src="@Url.Content("~/Images/patient.jpg")">
+                    <p>Total Patients</p>
+                    <p style="font-size: larger;font-weight: bold;" id="total-patients"></p>
+                </div>
+            </div>
+        </div>
+        <div class="todays-appointments card">
+            <h3>Today's Appointments</h3>
+            <ul id="todaysAppointments">
+
+            </ul>
+        </div>
+
+        <div class="weekly-scedule">
+
+            <div class="weekly-availability-schedule">
+                <div class="heading">
+                    <h3 style="padding-top: 30px;">Weekly Availability Schedule</h3>
+                </div>
+                <div class="monday card">
+                    <h5 style="font-size:40px;margin:1px;">8</h5>
+                    <p style="font-size:20px;margin:1px;">Mon</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                </div>
+                <div class="tuesday card">
+                    <h5 style="font-size:40px;margin:1px;">9</h5>
+                    <p style="font-size:20px;margin:1px;">Tue</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                </div>
+                <div class="wed card">
+                    <h5 style="font-size:40px;margin:1px;">10</h5>
+                    <p style="font-size:20px;margin:1px;">Wed</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                </div>
+                <div class="thurs card">
+                    <h5 style="font-size:40px;margin:1px;">11</h5>
+                    <p style="font-size:20px;margin:1px;">Thur</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                </div>
+                <div class="fri card">
+                    <h5 style="font-size:40px;margin:1px;">12</h5>
+                    <p style="font-size:20px;margin:1px;">Fri</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+
+                </div>
+                <div class="sat card">
+                    <h5 style="font-size:40px;margin:1px;">13</h5>
+                    <p style="font-size:20px;margin:1px;">Sat</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                </div>
+            </div>
+
+            <div class="todays-availability-breakdown ">
+                <div class="card">
+                    <h3>Today's Availability Breakdown</h3>
+                    <table>
+                        <tr>
+                            <th>slot</th>
+                            <th>scheduled</th>
+                            <th>cancelled</th>
+                            <th>completed</th>
+                            <th>Total</th>
+                        </tr>
+                        <tr>
+                            <td>10:00-12:00</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>10:00-12:00</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>10:00-12:00</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>5</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       
+        function displayTodaysAppointments(appointments){
+
+            todaysAppointments.innerHTML = "";
+
+            appointments.forEach(appointment => {
+                const appointmentDate = new Date(appointment.AppointmentsDateTime);
+                const li=document.createElement('li');
+
+                li.textContent = `${appointmentDate.getDate()}-${appointmentDate.getMonth() + 1}-${appointmentDate.getFullYear()} - ${appointmentDate.getHours()}:${appointmentDate.getMinutes()}`;
+                if (appointmentDate.getMinutes() === 0) {
+                    li.textContent += `0 with ${ appointment.Name } `;
+                }
+                else
+                {
+                    li.textContent += ` with ${ appointment.Name } `;
+                }
+
+                const button = document.createElement('button');
+                button.dataset.appointmentId = appointment.AppointmentId;
+
+
+                const eye = document.createElement('i');
+                eye.classList.add('bi','bi-eye-fill');
+                button.classList.add('view');
+
+                button.appendChild(eye);
+                li.appendChild(button);
+                todaysAppointments.appendChild(li);
+            });
+        }
+
+        $(document).ready(function () {
+            let username = "";
+            $.ajax({
+                url: '/Auth/GetLoggedInUser',
+                type: 'GET',
+                success: function (data) {
+
+                    const loggedUser = JSON.parse(data);
+
+                    $('#name').text(loggedUser.Name);
+                   
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error occurred while retrieving logged-in user:', errorThrown);
+                }
+            });
+
+            $.ajax({
+                url: '/Doctor/GetAppointmentsForWeek',
+                type: 'GET',
+                success: function (data) {
+                   
+                    const appointments = JSON.parse(data);
+                    console.log(appointments);
+
+                    $('#total-appointments').text(appointments.length);
+
+                    const scheduled = appointments.filter((appointment) => appointment.Status === "scheduled").length;
+                    const completed = appointments.filter((appointment) => appointment.Status === "completed").length;
+                    const cancelled = appointments.filter((appointment) => appointment.Status === "cancelled").length;
+
+                    $('#scheduled').text(scheduled);
+                    $('#cancelled').text(cancelled);
+                    $('#completed').text(completed);
+
+                    const totalPatients = appointments.filter((appointment, index, self) =>
+                        index === self.findIndex((t) => (
+                            t.PatientId === appointment.PatientId
+                        ))
+                    ).length;
+
+                    $('#total-patients').text(totalPatients);
+
+
+                    const today = new Date();
+                    const todayDatePart = today.toISOString().slice(0, 10);
+                  
+                    const todaysAppointments = appointments.filter(appointment => {
+                        const date = new Date(appointment.AppointmentsDateTime);
+                        return date.toISOString().slice(0, 10) === todayDatePart ? true : false;
+                    });
+                    displayTodaysAppointments(todaysAppointments);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error occurred while retrieving logged-in user:', errorThrown);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

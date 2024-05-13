@@ -13,16 +13,26 @@ namespace Services.ServiceModels
     {
         public Guid AppointmentId { get; set; }
         public DateTime AppointmentsDateTime { get; set; }
-        public string DoctorName { get; set; }
+        public string Name { get; set; }
         public string Status { get; set; }
         public string Notes { get; set; }
-        public AppointmentDTO(Guid appointmentId,string doctorName, DateTime appointmentDatetIime , string status, string notes)
+        public Guid? PatientId { get;set; }
+        public AppointmentDTO(Guid appointmentId,string name, DateTime appointmentDatetIime , string status, string notes)
         {
             AppointmentId=appointmentId;
-            DoctorName = doctorName;
+            Name = name;
             AppointmentsDateTime = appointmentDatetIime;
             Status = status;
             Notes = notes;
+        }
+        public AppointmentDTO(Guid appointmentId, string name, DateTime appointmentDatetIime, string status, string notes,Guid patientId)
+        {
+            AppointmentId = appointmentId;
+            Name = name;
+            AppointmentsDateTime = appointmentDatetIime;
+            Status = status;
+            Notes = notes;
+            PatientId = patientId;
         }
     }
 }

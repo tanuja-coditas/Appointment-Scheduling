@@ -208,7 +208,7 @@
                     @foreach (var appointment in Model)
                     {
                     <li class="appointment-item @appointment.Status.ToLower()">
-                        @appointment.AppointmentsDateTime.ToString("dd-MM-yyyy") -  @appointment.AppointmentsDateTime.ToString("HH:mm")  with Dr. @appointment.DoctorName
+                        @appointment.AppointmentsDateTime.ToString("dd-MM-yyyy") -  @appointment.AppointmentsDateTime.ToString("HH:mm")  with Dr. @appointment.Name
                         <button class="view" data-appointment-id="@appointment.AppointmentId"><i class="bi bi-eye-fill"></i></button></li>
                     }
                     </ul>

@@ -201,7 +201,8 @@ namespace AppointmentScheduling.Controllers
             Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
             Claim imagePathClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "imagePath");
 
-            var loggedUser = new { UserName = usernameClaim.Value, ImagePath = imagePathClaim.Value, Role = userRole.Value };
+            var user = userRepo.GetUser(usernameClaim.Value);
+            var loggedUser = new { UserName = usernameClaim.Value, ImagePath = imagePathClaim.Value, Role = userRole.Value , Name = user.FirstName+" "+user.LastName};
 
             var options = new JsonSerializerOptions
             {
@@ -225,7 +226,7 @@ namespace AppointmentScheduling.Controllers
         public IActionResult Logout()
         {
 
-            //HttpContext.Response.Cookies.Delete("JWTToken");
+            
             Response.Cookies.Delete("JWTToken");
             return RedirectToAction("Login", "Auth");
         }

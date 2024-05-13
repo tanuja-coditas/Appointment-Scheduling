@@ -310,9 +310,10 @@
 
         //display availability
         function displayAvailability(data,email) {
-            availabilityResults.innerHTML = "Nothing to show.."; 
+            availabilityResults.innerHTML = "";
+            let f = 0;
             data.forEach(day => {
-                availabilityResults.innerHTML = "";
+                f = 1;
                 const dateHeader = document.createElement('h6');
                 dateHeader.textContent = `Date: ${day.Date}`;
                 availabilityResults.appendChild(dateHeader);
@@ -323,7 +324,6 @@
 
                 day.TimeSlots.forEach(slot => {
                     const timeSlot = document.createElement('li');
-                    console.log("here");
                     console.log(slot);
                     timeSlot.textContent = `${slot.StartTime} - ${slot.EndTime}`;
                     timeSlotsList.appendChild(timeSlot);
@@ -336,6 +336,8 @@
                     timeSlotsList.appendChild(timeSlot);
                 });
             });
+            if(!f)
+                availabilityResults.innerHTML = "Nothing to show..";
 
         }
 

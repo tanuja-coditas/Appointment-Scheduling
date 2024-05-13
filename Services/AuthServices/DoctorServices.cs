@@ -16,12 +16,14 @@ namespace Services.AuthServices
         private readonly UserRepo _userRepo;
         private readonly SpecializationRepo _specializationRepo;
         private readonly AvailabilityRepo _availabilityRepo;
+        private readonly AppointmentRepo _appointmentRepo;
 
-        public DoctorServices(UserRepo userRepo,SpecializationRepo specializationRepo, AvailabilityRepo availabilityRepo)
+        public DoctorServices(UserRepo userRepo,SpecializationRepo specializationRepo, AvailabilityRepo availabilityRepo,AppointmentRepo appointmentRepo)
         {
             _userRepo = userRepo;
             _specializationRepo = specializationRepo;
             _availabilityRepo = availabilityRepo;
+            _appointmentRepo = appointmentRepo;
 
         }
 
@@ -158,8 +160,9 @@ namespace Services.AuthServices
         public List<AvailabilityData> GetAvailability(string email)
         {
             var doctor = _userRepo.GetUser(email);
-            var availability = _availabilityRepo.GetAvailability(doctor.UserId);
-
+            var availability = _availabilityRepo.GetAvailability(doctor.UserId).ToList();
+            //var todaysDate = DateTime.Today;
+            //availability = availability.Where(a => a.AvailabilityStartDatetime.Date >= todaysDate).ToList();
             var groupedByDate = availability.GroupBy(a => a.AvailabilityStartDatetime.Date);
 
             List<AvailabilityData> availabilityData = groupedByDate.Select(group =>
@@ -172,10 +175,29 @@ namespace Services.AuthServices
                      StartTime = a.AvailabilityStartDatetime.ToString("HH:mm"),
                      EndTime = a.AvailabilityEndDatetime.ToString("HH:mm")
                  }).OrderBy(slot => DateTime.Parse(slot.StartTime)).ToList() 
-             }).OrderByDescending(data => DateTime.Parse(data.Date)).ToList();
-
+             }).OrderBy(data => DateTime.Parse(data.Date)).ToList();
 
             return availabilityData;
+
+        }
+
+        public List<AppointmentDTO> GetAppointmentsForWeek(string username)
+        {
+            var doctor = _userRepo.GetUser(username);
+            var appointments = _appointmentRepo.GetDoctorAppointments(doctor.UserId);
+
+            int day = (int)DateTime.Today.DayOfWeek;
+            DateTime startDate = DateTime.Today.AddDays(-(day - 1));
+            DateTime endDate = startDate.AddDays(5);
+
+            var appointmentsThisWeek = appointments.Where(appointment => appointment.AppointmentDatetime >= startDate && appointment.AppointmentDatetime <= endDate);
+            var patients = _userRepo.GetByRole("patient");
+
+            var results  = (from appointment in appointmentsThisWeek
+                                join patient in patients
+                                on appointment.PatientId equals patient.UserId
+                                select new AppointmentDTO(appointment.AppointmentId, patient.FirstName + " " + patient.LastName, appointment.AppointmentDatetime, appointment.AppointmentStatus, appointment.Notes,appointment.PatientId)).ToList();
+            return results.OrderBy(appointment => appointment.AppointmentsDateTime.Date).ThenBy(appointment => DateTime.Parse(appointment.AppointmentsDateTime.ToString("HH:mm"))).ToList();
 
         }
     }
