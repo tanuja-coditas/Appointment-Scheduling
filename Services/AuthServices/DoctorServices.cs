@@ -197,8 +197,48 @@ namespace Services.AuthServices
                                 join patient in patients
                                 on appointment.PatientId equals patient.UserId
                                 select new AppointmentDTO(appointment.AppointmentId, patient.FirstName + " " + patient.LastName, appointment.AppointmentDatetime, appointment.AppointmentStatus, appointment.Notes,appointment.PatientId)).ToList();
-            return results.OrderBy(appointment => appointment.AppointmentsDateTime.Date).ThenBy(appointment => DateTime.Parse(appointment.AppointmentsDateTime.ToString("HH:mm"))).ToList();
+            return results.OrderByDescending(appointment => appointment.Status).ThenBy(appointment => appointment.AppointmentsDateTime.Date).ThenBy(appointment => DateTime.Parse(appointment.AppointmentsDateTime.ToString("HH:mm"))).ToList();
 
+        }
+
+        public List<AvailabilityAppointment> GetTodaysAvailabilityAndAppointments(string username)
+        {
+            var doctors = _userRepo.GetByRole("doctor");
+
+            var doctor = doctors.FirstOrDefault(doctor => doctor.UserName == username);
+
+            var availabilities = _availabilityRepo.GetAvailability(doctor.UserId);
+
+            var appointments = _appointmentRepo.GetDoctorAppointments(doctor.UserId);
+
+            var todaysAvailability = availabilities.Where(availability => availability.AvailabilityStartDatetime.Date.Equals(DateTime.Now.Date));
+
+            var todaysAppointments = appointments.Where(appointment => appointment.AppointmentDatetime.Date.Equals(DateTime.Now.Date));
+
+            var result = from availability in todaysAvailability
+                         join appointment in todaysAppointments
+                         on availability.AvailabilityStartDatetime.Date equals appointment.AppointmentDatetime.Date
+                         select new
+                         {
+                             AvailabilityStartTime = availability.AvailabilityStartDatetime,
+                             AvailabilityEndTime = availability.AvailabilityEndDatetime,
+                             Status = appointment.AppointmentStatus
+                         };
+            var groupedData = result.GroupBy(a => a.AvailabilityStartTime);
+
+            var data = groupedData.Select(group =>
+               new AvailabilityAppointment
+               {
+                   StartTime = group.Key.ToString("HH:mm"),
+                   EndTimeAndStatus = group.Select(a => new Slot
+                   {
+                       EndTime = a.AvailabilityEndTime.ToString("HH:mm"),
+                       Status = a.Status
+                   }).ToList()
+               }
+            ).ToList();
+
+            return data;
         }
     }
 }

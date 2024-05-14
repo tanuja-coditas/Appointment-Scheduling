@@ -44,7 +44,7 @@ namespace Services.AuthServices
                                on appointment.DoctorId equals doctor.UserId
                                select new AppointmentDTO(appointment.AppointmentId,doctor.FirstName+" "+doctor.LastName, appointment.AppointmentDatetime,appointment.AppointmentStatus,appointment.Notes)).ToList();
                               
-            return appointments;
+            return appointments.OrderByDescending(appointment => appointment.Status).ThenBy(appointment => appointment.AppointmentsDateTime).ToList();
         }
 
         public AppointmentDetailsDTO ViewAppointment(Guid appointmentId)

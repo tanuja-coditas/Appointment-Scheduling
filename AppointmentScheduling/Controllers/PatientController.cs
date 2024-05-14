@@ -66,7 +66,7 @@ namespace AppointmentScheduling.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles ="patient")]
+        [Authorize(Roles ="patient,doctor")]
         public async Task<IActionResult> CancelAppointment(Guid appointmentId)
         {
             await patientServices.UpdateAppointmentStatus(appointmentId,"cancelled");
@@ -74,7 +74,7 @@ namespace AppointmentScheduling.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "patient")]
+        [Authorize(Roles = "patient,doctor")]
         public async Task<IActionResult> CompleteAppointment(Guid appointmentId)
         {
             await patientServices.UpdateAppointmentStatus(appointmentId,"completed");
@@ -82,7 +82,7 @@ namespace AppointmentScheduling.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "patient")]
+        [Authorize(Roles = "doctor")]
         public async Task<IActionResult> AddAppointmentNotes(Guid appointmentId,string notes)
         {
             var updatednotes = await patientServices.UpdateAppointmentNotes(appointmentId, notes);

@@ -6,6 +6,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 
 namespace AppointmentScheduling.Controllers
 {
@@ -106,6 +107,24 @@ namespace AppointmentScheduling.Controllers
             };
             var json = JsonSerializer.Serialize(appointments, options);
             return Ok(json);
+        }
+
+        public IActionResult GetTodaysAvailabilityAndAppointments()
+        {
+            string jwtToken = HttpContext.Request.Cookies["JWTToken"];
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
+            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var username = usernameClaim.Value;
+            var result = _doctorServices.GetTodaysAvailabilityAndAppointments(username).ToArray();
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+
+            };
+            var json = JsonSerializer.Serialize(result, options);
+            return Ok(json);
+   
         }
     }
 }
