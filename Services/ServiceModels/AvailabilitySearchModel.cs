@@ -15,6 +15,7 @@ namespace Services.ServiceModels
     public class TimeSlot
     {
         public Guid AvailabilityId { get; set; }
+        public int AppointmentCount { get; set; }
         public string StartTime { get; set; }
         public string EndTime { get; set; }
     }

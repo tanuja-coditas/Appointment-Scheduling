@@ -137,14 +137,41 @@
             font-size: 14px;
         }
 
+        .day-header{
+            font-size: 40px;
+            margin: 1px;
+        }
 
+        .day{
+            font-size: 20px;
+            margin: 1px;
+        }
+
+        .day-appointments
+        {
+            font-size: 10px;
+            margin: 1px;
+        }
     </style>
 </head>
 <body>
+    @section Navigation {
+       
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/Doctor/Index"><span style="color:white;">Home</span></a>
+            </li>
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/Doctor/Availability"><span style="color:white;">Availability</span></a>
+        </li>
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/Doctor/Appointments"><span style="color:white;">Appointments</span></a>
+            </li>
+
+    }
     <div class="container">
         <div class="greetings">
             <div class="card" style="margin-top:100px;">
-                <h1>Welcome!, Dr. <span id="name"></span></h1>
+                <h1>Welcome! Dr. <span id="name"></span></h1>
                 <p>Have a nice day at work</p>
             </div>
         </div>
@@ -183,45 +210,24 @@
                 <div class="heading">
                     <h3 style="padding-top: 30px;">Weekly Availability Schedule</h3>
                 </div>
-                <div class="monday card">
-                    <h5 style="font-size:40px;margin:1px;">8</h5>
-                    <p style="font-size:20px;margin:1px;">Mon</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                <div class="monday card" id="0">
+                   
                 </div>
-                <div class="tuesday card">
-                    <h5 style="font-size:40px;margin:1px;">9</h5>
-                    <p style="font-size:20px;margin:1px;">Tue</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                <div class="tuesday card" id="1">
+                    
                 </div>
-                <div class="wed card">
-                    <h5 style="font-size:40px;margin:1px;">10</h5>
-                    <p style="font-size:20px;margin:1px;">Wed</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                <div class="wed card" id="2">
+                  
                 </div>
-                <div class="thurs card">
-                    <h5 style="font-size:40px;margin:1px;">11</h5>
-                    <p style="font-size:20px;margin:1px;">Thur</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                <div class="thurs card" id="3">
+                   
                 </div>
-                <div class="fri card">
-                    <h5 style="font-size:40px;margin:1px;">12</h5>
-                    <p style="font-size:20px;margin:1px;">Fri</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                <div class="fri card" id="4">
+                   
 
                 </div>
-                <div class="sat card">
-                    <h5 style="font-size:40px;margin:1px;">13</h5>
-                    <p style="font-size:20px;margin:1px;">Sat</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
-                    <p style="font-size: 10px;margin:1px;">10:00-12:00</p>
+                <div class="sat card" id="5">
+                   
                 </div>
             </div>
 
@@ -250,6 +256,104 @@
     </div>
     <script>
        
+        function displayWeeklyBreakdown(appointments) {
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
+            let currentDate;
+            
+            for (let id = 0; id < 6; id++) {
+                if (id < appointments.length) {
+                    const container = document.getElementById(id);
+                    container.innerHTML = "";
+                    const header = document.createElement('h5');
+                    header.classList.add('day-header');
+                    const date = new Date(appointments[id].DateTime);
+                    currentDate=date;
+                    header.textContent = date.getDate();
+
+                    const day = document.createElement('p');
+                    day.classList.add('day');
+                    day.textContent = days[date.getDay()];
+
+
+                    const statuses = appointments[id].Statuses.$values;
+                    const total = statuses.length;
+                    const scheduled = statuses.filter((status) => status === "scheduled").length;
+                    const completed = statuses.filter((status) => status === "completed").length;
+                    const cancelled = statuses.filter((status) => status === "cancelled").length;
+
+
+                    const totalP = document.createElement('p');
+                    totalP.classList.add('day-appointments');
+                    totalP.textContent = `Total : ${total}`;
+
+
+                    const scheduledP = document.createElement('p');
+                    scheduledP.classList.add('day-appointments');
+                    scheduledP.textContent = `Scheduled : ${scheduled}`;
+
+                    const cancelledP = document.createElement('p');
+                    cancelledP.classList.add('day-appointments');
+                    cancelledP.textContent = `Cancelled : ${cancelled}`;
+
+                    const completedP = document.createElement('p');
+                    completedP.classList.add('day-appointments');
+                    completedP.textContent = `Completed : ${completed}`;
+                    
+                    
+                    container.appendChild(header);
+                    container.appendChild(day);
+                    
+                    container.appendChild(scheduledP);
+                    container.appendChild(cancelledP);
+                    container.appendChild(completedP);
+                   // container.appendChild(totalP);
+
+                }
+                else{
+
+                    const container = document.getElementById(id);
+                    container.innerHTML = "";
+
+                    let date = new Date(currentDate);
+                    date.setDate(currentDate.getDate() + 1);
+
+                    const header = document.createElement('h5');
+                    header.classList.add('day-header')
+                    currentDate = date;
+                    header.textContent = date.getDate();
+
+                    const day = document.createElement('p');
+                    day.classList.add('day');
+                    day.textContent = days[date.getDay()];
+
+                    const totalP = document.createElement('p');
+                    totalP.classList.add('day-appointments');
+                    totalP.textContent = `Total : 0`;
+
+
+                    const scheduledP = document.createElement('p');
+                    scheduledP.classList.add('day-appointments');
+                    scheduledP.textContent = `Scheduled : 0`;
+
+                    const cancelledP = document.createElement('p');
+                    cancelledP.classList.add('day-appointments');
+                    cancelledP.textContent = `Cancelled : 0`;
+
+                    const completedP = document.createElement('p');
+                    completedP.classList.add('day-appointments');
+                    completedP.textContent = `Completed : 0`;
+
+                    container.appendChild(header);
+                    container.appendChild(day);
+
+                    container.appendChild(scheduledP);
+                    container.appendChild(cancelledP);
+                    container.appendChild(completedP);
+                   //container.appendChild(totalP);
+
+                }
+            }
+        }
         function displayTodaysBreakdown(results)
         {
             slotTable.innerHTML = "";
@@ -288,11 +392,11 @@
                 data1.textContent = `${slot.StartTime}-${endTime.EndTime}`;
                
                 const statuses = slot.EndTimeAndStatus.$values;
-                const total = statuses.length;
+               
                 const scheduled = statuses.filter((status) => status.Status === "scheduled").length;
                 const completed = statuses.filter((status) => status.Status === "completed").length;
                 const cancelled = statuses.filter((status) => status.Status === "cancelled").length;
-
+                const total = scheduled + completed + cancelled;
                 const data2 = document.createElement('td');
                 data2.textContent = `${scheduled}`;
 
@@ -517,7 +621,7 @@
         }
 
         $(document).ready(function () {
-            let userRole=""
+            let userRole = "";
             let username = "";
             $.ajax({
                 url: '/Auth/GetLoggedInUser',
@@ -589,6 +693,20 @@
                     console.error('Error occurred while retrieving availability and appointments:', errorThrown);
                 }
             });
+
+            $.ajax({
+                url:'/Doctor/GetWeeklyBreakdown',
+                type:'GET',
+                success:function(response){
+                    const result = JSON.parse(response);
+                    console.log(result);
+                    displayWeeklyBreakdown(result);
+                },
+                error:{
+
+                }
+            });
+           
             $(document).on("click", ".view", function () {
 
                 $("#appointmentDetailsModal").modal('show');

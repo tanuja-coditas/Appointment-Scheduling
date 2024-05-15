@@ -22,6 +22,12 @@ namespace Repo
             return _context.TblAvailabilities.Where(availability => availability.DoctorId == doctorId).ToList();
         }
 
+        
+        public async Task CreateAvailability(TblAvailability availability)
+        {
+            await _context.TblAvailabilities.AddAsync(availability);
+            await _context.SaveChangesAsync();
+        }
         public DateTime UpdateAvailability(Guid availabilityId)
         {
            var availability =_context.TblAvailabilities.FirstOrDefault(availability => availability.AvailabilityId == availabilityId);

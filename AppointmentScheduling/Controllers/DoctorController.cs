@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.AuthServices;
+using Services.ServiceModels;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace AppointmentScheduling.Controllers
 {
@@ -91,7 +94,6 @@ namespace AppointmentScheduling.Controllers
             var json = JsonSerializer.Serialize(doctorsAvailability, options);
             return Ok(json);
         }
-
         public IActionResult GetAppointmentsForWeek()
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
@@ -125,6 +127,62 @@ namespace AppointmentScheduling.Controllers
             var json = JsonSerializer.Serialize(result, options);
             return Ok(json);
    
+        }
+
+        public IActionResult GetWeeklyBreakdown()
+        {
+            string jwtToken = HttpContext.Request.Cookies["JWTToken"];
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
+            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var username = usernameClaim.Value;
+
+            var appointments = _doctorServices.GetWeeklyBreakdown(username);
+
+            var groupedData = appointments.GroupBy(appointment => appointment.AppointmentDatetime.Date)
+                                           .Select(group => new
+                                           {
+                                               DateTime = group.Key,
+                                               Statuses = group.Select(g => g.AppointmentStatus ).ToList()
+                                           }).ToArray();
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+
+            };
+            var json = JsonSerializer.Serialize(groupedData, options);
+            return Ok(json);
+            
+        }
+
+        public IActionResult Availability()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Availability(AvailabilityDTO availability)
+        {
+            if(ModelState.IsValid)
+            {
+                string jwtToken = HttpContext.Request.Cookies["JWTToken"];
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
+                Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+                var username = usernameClaim.Value;
+
+                await _doctorServices.AddAvailability(availability,username);
+                return View();
+            }
+            return View(availability);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteAvailability(Guid availabilityId)
+        {
+            _doctorServices.DeleteAvailability(availabilityId);
+            return Ok();
         }
     }
 }

@@ -57,7 +57,7 @@
       "weekly-availability-schedule weekly-availability-schedule weekly-availability-schedule"
       "todays-availability-breakdown todays-availability-breakdown todays-availability-breakdown";
     grid-area: weekly-scedule;
-    width: 400px;
+    width: 400px; /* 400px,700px*/
     height: 700px;
    
   }

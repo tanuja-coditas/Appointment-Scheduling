@@ -9,6 +9,7 @@ using Services.ServiceModels;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using NuGet.Protocol;
 namespace Services.AuthServices
 {
     public class DoctorServices
@@ -172,6 +173,7 @@ namespace Services.AuthServices
                  TimeSlots = group.Select(a => new TimeSlot
                  {
                      AvailabilityId = a.AvailabilityId,
+                     AppointmentCount = a.AppointmentCount,
                      StartTime = a.AvailabilityStartDatetime.ToString("HH:mm"),
                      EndTime = a.AvailabilityEndDatetime.ToString("HH:mm")
                  }).OrderBy(slot => DateTime.Parse(slot.StartTime)).ToList() 
@@ -203,9 +205,7 @@ namespace Services.AuthServices
 
         public List<AvailabilityAppointment> GetTodaysAvailabilityAndAppointments(string username)
         {
-            var doctors = _userRepo.GetByRole("doctor");
-
-            var doctor = doctors.FirstOrDefault(doctor => doctor.UserName == username);
+            var doctor = _userRepo.GetUser(username);
 
             var availabilities = _availabilityRepo.GetAvailability(doctor.UserId);
 
@@ -222,7 +222,7 @@ namespace Services.AuthServices
                          {
                              AvailabilityStartTime = availability.AvailabilityStartDatetime,
                              AvailabilityEndTime = availability.AvailabilityEndDatetime,
-                             Status = appointment.AppointmentStatus
+                             Status = availability.AvailabilityStartDatetime.ToString("HH:mm") == appointment.AppointmentDatetime.ToString("HH:mm")?appointment.AppointmentStatus:"unknown"
                          };
             var groupedData = result.GroupBy(a => a.AvailabilityStartTime);
 
@@ -239,6 +239,41 @@ namespace Services.AuthServices
             ).ToList();
 
             return data;
+        }
+
+
+        public List<TblAppointment> GetWeeklyBreakdown( string username)
+        {
+            var doctor = _userRepo.GetUser(username);
+            var appointments = _appointmentRepo.GetDoctorAppointments(doctor.UserId);
+
+            int day = (int)DateTime.Today.DayOfWeek;
+            DateTime startDate = DateTime.Today.AddDays(-(day - 1));
+            DateTime endDate = startDate.AddDays(5);
+
+            var appointmentsThisWeek = appointments.Where(appointment => appointment.AppointmentDatetime >= startDate && appointment.AppointmentDatetime <= endDate)
+                                                    .OrderBy(appointment => appointment.AppointmentDatetime).ThenBy(appointment => DateTime.Parse(appointment.AppointmentDatetime.ToString("HH:mm")));
+
+            return appointmentsThisWeek.ToList();
+
+        }
+
+        public async Task AddAvailability(AvailabilityDTO model,string username)
+        {
+            var doctor = _userRepo.GetUser(username);
+            var availability = new TblAvailability() {
+                                  DoctorId = doctor.UserId,
+                                  AvailabilityStartDatetime = model.AvailabilityStartDatetime,
+                                  AvailabilityEndDatetime = model.AvailabilityEndDatetime,
+                                  AppointmentCount = model.AppointmentCount};
+            
+           await _availabilityRepo.CreateAvailability(availability);
+        }
+
+        public void DeleteAvailability(Guid availabilityId)
+        {
+           
+            _availabilityRepo.DeleteAvailability(availabilityId);
         }
     }
 }

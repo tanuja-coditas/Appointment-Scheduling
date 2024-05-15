@@ -56,6 +56,17 @@
     </style>
 </head>
 <body>
+    @section Navigation {
+
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/Patient/Index"><span style="color:white;">Home</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/Patient/Appointments"><span style="color:white;">Appointments</span></a>
+        </li>
+
+    }
+
     <section class="search-section">
       @if(TempData["SearchType"] == "name")
         {
