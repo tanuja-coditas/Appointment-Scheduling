@@ -22,24 +22,26 @@ namespace Repo
             return _context.TblAvailabilities.Where(availability => availability.DoctorId == doctorId).ToList();
         }
 
-        
+        public TblAvailability GetAvailabilityById(Guid availabilityId)
+        {
+            return _context.TblAvailabilities.FirstOrDefault(availability => availability.AvailabilityId == availabilityId);
+        }
         public async Task CreateAvailability(TblAvailability availability)
         {
             await _context.TblAvailabilities.AddAsync(availability);
             await _context.SaveChangesAsync();
         }
-        public DateTime UpdateAvailability(Guid availabilityId)
+        public DateTime UpdateAvailability(Guid availabilityId,bool isWaiting = false)
         {
            var availability =_context.TblAvailabilities.FirstOrDefault(availability => availability.AvailabilityId == availabilityId);
             if(availability !=null)
             {
-                availability.AppointmentCount--;
-                _context.SaveChanges();
-                var datetime = availability.AvailabilityStartDatetime;
-                if (availability.AppointmentCount == 0)
+                if(!isWaiting)
                 {
-                   DeleteAvailability(availability.AvailabilityId);
+                    availability.AppointmentCount--;
+                    _context.SaveChanges();
                 }
+                var datetime = availability.AvailabilityStartDatetime;
                 return datetime;
             }
             return default(DateTime);
@@ -55,6 +57,12 @@ namespace Repo
                 _context.TblAvailabilities.Remove(availability);
                 _context.SaveChanges();
             }
+        }
+
+        public async Task UpdateAvailability(TblAvailability  availability)
+        {
+            _context.Entry(availability).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }

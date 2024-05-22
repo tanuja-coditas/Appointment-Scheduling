@@ -14,4 +14,10 @@ namespace Services.ServiceModels
 
         public int AppointmentCount { get; set; }
     }
+
+    public class EditAvailability
+    {
+        public Guid AvailabilityId { get; set; }
+        public AvailabilityDTO Availability { get; set; }
+    }
 }

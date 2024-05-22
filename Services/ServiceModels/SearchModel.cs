@@ -18,7 +18,7 @@ namespace Services.ServiceModels
 
         public string PhoneNumber { get; set; } = null!;
 
-        public string Address { get; set; } = null!;
+        public string Address { get; set; } = null!;   
 
         public string UserImage { get; set; } = null!;
 

@@ -221,7 +221,9 @@ namespace AppointmentScheduling.Controllers
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
             Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
-            return View();
+
+            var profile = authentication.GetProfile(usernameClaim.Value);
+            return View(profile);
         }
         public IActionResult Logout()
         {

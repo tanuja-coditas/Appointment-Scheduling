@@ -141,6 +141,13 @@
                     editButton.textContent = "Edit";
                     editButton.dataset.availabilityId = `${slot.AvailabilityId}`;
 
+                    editButton.addEventListener('click', function () {
+                        
+                        const availabilityId = this.dataset.availabilityId;
+                        const url = `/Doctor/UpdateAvailability?availabilityId=${availabilityId}`;
+                        window.location.href = url;
+                    });
+
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = "Delete";
                     deleteButton.dataset.availabilityId = `${slot.AvailabilityId}`;
@@ -202,7 +209,7 @@
                 const availabilityId = $(this).data("availability-id");
 
 
-                $.ajax({
+                $.ajax({  
                     url: '/Doctor/DeleteAvailability',
                     type: 'DELETE',
                     data: {
@@ -237,47 +244,12 @@
                 });
             });
 
+
+           
            
         });
     </script>
     
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

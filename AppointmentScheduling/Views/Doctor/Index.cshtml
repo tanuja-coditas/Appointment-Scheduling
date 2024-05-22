@@ -233,7 +233,7 @@
 
             <div class="todays-availability-breakdown ">
                 <div class="card">
-                    <h3>Today's Availability Breakdown</h3>
+                    <h3>Today's Appointments Breakdown</h3>
                     <table id="slotTable">
   
                     </table>
@@ -258,7 +258,7 @@
        
         function displayWeeklyBreakdown(appointments) {
             const days = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
-            let currentDate;
+            let currentDate=new Date();
             
             for (let id = 0; id < 6; id++) {
                 if (id < appointments.length) {
@@ -310,7 +310,7 @@
 
                 }
                 else{
-
+                    console.log("hiii");
                     const container = document.getElementById(id);
                     container.innerHTML = "";
 
@@ -382,7 +382,8 @@
             headerRow.appendChild(header5);
 
             slotTable.appendChild(headerRow);
-
+            console.log("helllooo");
+            console.log(results);
             results.forEach(slot => {
                 const row = document.createElement('tr');
 

@@ -10,17 +10,20 @@ using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Common;
 
 namespace AppointmentScheduling.Controllers
 {
     public class DoctorController : Controller
     {
         private readonly DoctorServices _doctorServices;
+        private readonly JwtToken _jwtToken;
 
         // GET: DoctorController
-        public DoctorController(DoctorServices doctorServices)
+        public DoctorController(DoctorServices doctorServices,JwtToken jwtToken)
         {
             _doctorServices = doctorServices;
+            _jwtToken = jwtToken;
         }
 
         [Authorize(Roles ="doctor")]
@@ -97,9 +100,8 @@ namespace AppointmentScheduling.Controllers
         public IActionResult GetAppointmentsForWeek()
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
-            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
             var username = usernameClaim.Value;
             var appointments = _doctorServices.GetAppointmentsForWeek(username).ToArray();
             var options = new JsonSerializerOptions
@@ -114,9 +116,8 @@ namespace AppointmentScheduling.Controllers
         public IActionResult GetTodaysAvailabilityAndAppointments()
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
-            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
             var username = usernameClaim.Value;
             var result = _doctorServices.GetTodaysAvailabilityAndAppointments(username).ToArray();
             var options = new JsonSerializerOptions
@@ -126,15 +127,14 @@ namespace AppointmentScheduling.Controllers
             };
             var json = JsonSerializer.Serialize(result, options);
             return Ok(json);
-   
+      
         }
 
         public IActionResult GetWeeklyBreakdown()
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
-            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
             var username = usernameClaim.Value;
 
             var appointments = _doctorServices.GetWeeklyBreakdown(username);
@@ -160,11 +160,23 @@ namespace AppointmentScheduling.Controllers
         {
             return View();
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> Availability(AvailabilityDTO availability)
         {
-            if(ModelState.IsValid)
+            if(availability.AppointmentCount == 0)
+            {
+                ModelState.AddModelError("AppointmentCount", "Appointment Count can not be 0");
+            }
+            if(availability.AvailabilityStartDatetime < DateTime.Now)
+            {
+                ModelState.AddModelError("AvailabilityStartDatetime", "Appointment start date and time cannot be past date time");
+            }
+            if (availability.AvailabilityStartDatetime < DateTime.Now)
+            {
+                ModelState.AddModelError("AvailabilityEndDatetime", "Appointment end date and time cannot be past date time");
+            }
+            if (ModelState.IsValid)
             {
                 string jwtToken = HttpContext.Request.Cookies["JWTToken"];
                 JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
@@ -183,6 +195,56 @@ namespace AppointmentScheduling.Controllers
         {
             _doctorServices.DeleteAvailability(availabilityId);
             return Ok();
+        }
+
+       
+        public IActionResult UpdateAvailability(Guid availabilityId)
+        {
+            var availability = _doctorServices.GetAvailability(availabilityId);
+            var model = new AvailabilityDTO()
+            {
+                AvailabilityStartDatetime = availability.AvailabilityStartDatetime,
+                AvailabilityEndDatetime = availability.AvailabilityEndDatetime,
+                AppointmentCount = availability.AppointmentCount,
+
+            };
+
+            var editModel = new EditAvailability()
+            {
+                AvailabilityId = availability.AvailabilityId,
+                Availability = model,
+            };
+         
+            return View("UpdateAvailability",editModel);
+        }
+        [HttpPost]
+        public async  Task<IActionResult> UpdateAvailability(EditAvailability editModel)
+        {
+            if (editModel.Availability.AppointmentCount == 0)
+            {
+                ModelState.AddModelError("Availability.AppointmentCount", "Appointment Count can not be 0");
+            }
+            
+            if (ModelState.IsValid)
+            {
+
+                await _doctorServices.UpdateAvailability(editModel.AvailabilityId,editModel.Availability);
+                TempData["SuccessMessage"] = "Availability updated successfully!";
+                return View("Availability");
+            }
+            
+            return View(editModel);
+        }
+
+        public IActionResult Appointments(string status = "all")
+        {
+            string jwtToken = HttpContext.Request.Cookies["JWTToken"];
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
+            var username = usernameClaim.Value;
+            var appointments = _doctorServices.GetAppointments(username);
+            appointments = appointments.Where(appointment => appointment.Status.ToLower() == status.ToLower() || status.ToLower() == "all").ToList();
+            return View("Appointments", appointments);
         }
     }
 }

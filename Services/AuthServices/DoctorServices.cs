@@ -30,7 +30,7 @@ namespace Services.AuthServices
 
         public List<SearchModel> GetDoctors()
         {
-            var doctors = _userRepo.GetByRole("doctor");
+            var doctors = _userRepo.GetByRole(Roles.doctor.ToString());
             var specializations = _specializationRepo.GetSepcialiazations();
             var doctor_specailizations = _specializationRepo.GetDoctorSpecialization();
 
@@ -65,7 +65,7 @@ namespace Services.AuthServices
 
         public List<SearchModel> GetDoctorsByName(string name)
         {
-            var doctors = _userRepo.GetByRole("doctor");
+            var doctors = _userRepo.GetByRole(Roles.doctor.ToString());
             var specializations = _specializationRepo.GetSepcialiazations();
             var doctor_specailizations = _specializationRepo.GetDoctorSpecialization();
             string[] nameParts = name.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -119,7 +119,7 @@ namespace Services.AuthServices
 
         public List<SearchModel> GetDoctorsBySpecialization(string speciality, string location)
         {
-            var doctors = _userRepo.GetByRole("doctor");
+            var doctors = _userRepo.GetByRole(Roles.doctor.ToString());
             var specializations = _specializationRepo.GetSepcialiazations();
             var doctor_specailizations = _specializationRepo.GetDoctorSpecialization();
 
@@ -193,7 +193,7 @@ namespace Services.AuthServices
             DateTime endDate = startDate.AddDays(5);
 
             var appointmentsThisWeek = appointments.Where(appointment => appointment.AppointmentDatetime >= startDate && appointment.AppointmentDatetime <= endDate);
-            var patients = _userRepo.GetByRole("patient");
+            var patients = _userRepo.GetByRole(Roles.patient.ToString());
 
             var results  = (from appointment in appointmentsThisWeek
                                 join patient in patients
@@ -220,9 +220,10 @@ namespace Services.AuthServices
                          on availability.AvailabilityStartDatetime.Date equals appointment.AppointmentDatetime.Date
                          select new
                          {
+                            
                              AvailabilityStartTime = availability.AvailabilityStartDatetime,
                              AvailabilityEndTime = availability.AvailabilityEndDatetime,
-                             Status = availability.AvailabilityStartDatetime.ToString("HH:mm") == appointment.AppointmentDatetime.ToString("HH:mm")?appointment.AppointmentStatus:"unknown"
+                             Status = availability.AvailabilityStartDatetime.ToString("HH:mm") == appointment.AppointmentDatetime.ToString("HH:mm")?appointment.AppointmentStatus:Status.unknown.ToString()
                          };
             var groupedData = result.GroupBy(a => a.AvailabilityStartTime);
 
@@ -275,5 +276,35 @@ namespace Services.AuthServices
            
             _availabilityRepo.DeleteAvailability(availabilityId);
         }
+
+        public TblAvailability GetAvailability(Guid availabilityId)
+        {
+            var availability = _availabilityRepo.GetAvailabilityById(availabilityId);
+            return availability;
+        }
+
+        public async Task UpdateAvailability(Guid availabilityId,AvailabilityDTO model)
+        {
+            var availability = _availabilityRepo.GetAvailabilityById(availabilityId);
+            availability.AvailabilityStartDatetime = model.AvailabilityStartDatetime;
+            availability.AvailabilityEndDatetime = model.AvailabilityEndDatetime;
+            availability.AppointmentCount = model.AppointmentCount;
+            await _availabilityRepo.UpdateAvailability(availability);
+       
+        }
+
+        public List<AppointmentDTO> GetAppointments(string username)
+        {
+            var doctor = _userRepo.GetUser(username);
+            var patients = _userRepo.GetByRole(Roles.patient.ToString());
+            var results = _appointmentRepo.GetDoctorAppointments(doctor.UserId);
+            var appointments = (from appointment in results
+                                join patient in patients
+                                on appointment.PatientId equals patient.UserId
+                                select new AppointmentDTO(appointment.AppointmentId, patient.FirstName + " " + patient.LastName, appointment.AppointmentDatetime, appointment.AppointmentStatus, appointment.Notes)).ToList();
+
+            return appointments.OrderByDescending(appointment => appointment.Status).ThenBy(appointment => appointment.AppointmentsDateTime).ToList();
+        }
+
     }
 }

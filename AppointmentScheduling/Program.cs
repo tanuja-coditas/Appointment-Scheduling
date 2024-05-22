@@ -35,6 +35,8 @@ namespace AppointmentScheduling
             builder.Services.AddTransient<SpecializationRepo>();
             builder.Services.AddTransient<AvailabilityRepo>();
             builder.Services.AddTransient<AppointmentRepo>();
+            builder.Services.AddTransient<WaitListRepo>();
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddTransient<PatientServices>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

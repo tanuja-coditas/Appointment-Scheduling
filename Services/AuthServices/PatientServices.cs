@@ -26,18 +26,26 @@ namespace Services.AuthServices
             this.specializationRepo = specializationRepo;
         }
 
-        public async Task BookAppointment(string username, string doctorEmail, Guid availabilityId)
+        public async Task BookAppointment(string username, string doctorEmail, Guid availabilityId,bool isWaiting = false)
         {
             var user = userRepo.GetUser(username);
             var doctor = userRepo.GetUser(doctorEmail);
-            var datetime = availabilityRepo.UpdateAvailability(availabilityId);
-            appointmentRepo.Create(user.UserId, doctor.UserId, datetime);
+            var datetime = availabilityRepo.UpdateAvailability(availabilityId,isWaiting);
+            appointmentRepo.Create(user.UserId, doctor.UserId, datetime,isWaiting);
+            if(isWaiting)
+            {
+                var waitlist = new TblWaitlist()
+                {
+                   // WaitlistDate = datetime.ToString("yyyy-MM-dd"),  
+
+                };
+            }
         }
 
         public List<AppointmentDTO> GetAppointments(string username)
         {
             var patient = userRepo.GetUser(username);
-            var doctors = userRepo.GetByRole("doctor");
+            var doctors = userRepo.GetByRole(Roles.doctor.ToString());
             var results = appointmentRepo.GetPatientAppointments(patient.UserId);
             var appointments = (from appointment in results
                                join doctor in doctors

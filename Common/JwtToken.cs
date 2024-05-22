@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Repo;
@@ -16,18 +17,21 @@ namespace Common
     {
         private readonly IConfiguration _config;
 
-        private readonly  RoleRepo roleRepo;
+        private readonly  RoleRepo _roleRepo;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public JwtToken(IConfiguration config,RoleRepo roleRepo) {
+        public JwtToken(IConfiguration config,RoleRepo roleRepo, IHttpContextAccessor httpContextAccessor) {
             _config = config;
-            this.roleRepo = roleRepo;
+            _roleRepo = roleRepo;
+            _httpContextAccessor = httpContextAccessor;
         }
         public string GenerateToken(TblUser user,out string role)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            string Role = roleRepo.GetRoleName(user.RoleId);
+            string Role = _roleRepo.GetRoleName(user.RoleId);
             role = Role;
+    
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier,user.UserName),
@@ -44,6 +48,14 @@ namespace Common
 
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public JwtSecurityToken GetToken(string token)
+        {
+            string jwtToken = _httpContextAccessor.HttpContext.Request.Cookies["JWTToken"];
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
+            return parsedToken;
         }
 
     }

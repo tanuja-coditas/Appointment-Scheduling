@@ -10,13 +10,13 @@
     <title>My Appointments</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-      
+
 
         .container {
             max-width: 800px;
             background-color: #fff;
             padding: 30px;
-            height:auto  ;
+            height: auto;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -67,10 +67,11 @@
             background-color: #28a745;
         }
 
-        .all-button.active{
-            color:white;
-            background-color:teal;
+        .all-button.active {
+            color: white;
+            background-color: teal;
         }
+
         .appointment-list {
             list-style: none;
             padding: 0;
@@ -97,18 +98,19 @@
             background-color: rgba(40, 167, 69, 0.1);
             color: #28a745;
         }
-        .view{
-            border:none;
-            background-color:rgba(255,255,255,0.0);
-            float:right;
-            padding-left:40px;
+
+        .view {
+            border: none;
+            background-color: rgba(255,255,255,0.0);
+            float: right;
+            padding-left: 40px;
         }
 
         .bi-eye-fill {
             color: #007bff;
         }
 
-       
+
         .appointment-container {
             border: 1px solid #ccc;
             background-color: #f9f9f9;
@@ -116,48 +118,48 @@
             margin-bottom: 10px;
         }
 
-       
+
         .appointment-header {
             font-size: 18px;
             margin-bottom: 10px;
         }
 
-        
+
         .appointment-details {
             margin-bottom: 10px;
         }
 
-       
+
         .patient-details {
             margin-bottom: 10px;
         }
 
-        
+
         .doctor-details {
             margin-bottom: 10px;
         }
 
-        
+
         .notes-section {
             margin-bottom: 10px;
         }
 
-       
+
         .button {
             background-color: #007bff;
             color: #fff;
             border: none;
             padding: 5px 10px;
             cursor: pointer;
-            margin-left:4px;
+            margin-left: 4px;
         }
 
-        
+
         .doctor-header {
             font-size: 16px;
             margin-bottom: 5px;
         }
-       
+
         .details-container {
             border: 1px solid #ccc;
             background-color: #f9f9f9;
@@ -165,29 +167,29 @@
             margin-bottom: 10px;
         }
 
-        
+
         .details-header {
             font-size: 20px;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
-       
+
         .detail-item {
             margin-bottom: 5px;
         }
 
-        
+
         .name {
             font-weight: bold;
         }
 
-        
+
         .contact-info {
             font-style: italic;
         }
 
-        
+
         .address {
             font-size: 14px;
         }
@@ -198,14 +200,17 @@
     @section Navigation {
 
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Patient/Index"><span style="color:white;">Home</span></a>
+            <a class="nav-link active" aria-current="page" href="/Doctor/Index"><span style="color:white;">Home</span></a>
         </li>
-
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Patient/Appointments"><span style="color:white;">Appointments</span></a>
+            <a class="nav-link active" aria-current="page" href="/Doctor/Availability"><span style="color:white;">Availability</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/Doctor/Appointments"><span style="color:white;">Appointments</span></a>
         </li>
 
     }
+
 
     <div class="container my-5">
         <h1 class="text-center mb-4">My Appointments</h1>
@@ -218,22 +223,23 @@
         <div class="no-appointments text-center" style="display: none;">
             No appointments to show.
         </div>
-            @if (Model.Count > 0)
-            {
-                    <ul class="appointment-list">
-                    @foreach (var appointment in Model)
-                    {
+        @if (Model.Count > 0)
+        {
+            <ul class="appointment-list">
+                @foreach (var appointment in Model)
+                {
                     <li class="appointment-item @appointment.Status.ToLower()">
-                        @appointment.AppointmentsDateTime.ToString("dd-MM-yyyy") -  @appointment.AppointmentsDateTime.ToString("HH:mm")  with Dr. @appointment.Name
-                        <button class="view" data-appointment-id="@appointment.AppointmentId"><i class="bi bi-eye-fill"></i></button></li>
-                    }
-                    </ul>
-            }
-            else
-            {
-                <p>No appointments To Show.</p>
-            }
-       
+                        @appointment.AppointmentsDateTime.ToString("dd-MM-yyyy") -  @appointment.AppointmentsDateTime.ToString("HH:mm")  with @appointment.Name
+                        <button class="view" data-appointment-id="@appointment.AppointmentId"><i class="bi bi-eye-fill"></i></button>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No appointments To Show.</p>
+        }
+
     </div>
 
     <div id="appointmentDetailsModal" class="modal " tabindex="-1" style="display: none;overflow:auto">
@@ -251,7 +257,7 @@
     </div>
     <script>
 
-        function displayAppointmentDetails(appointment,role){
+        function displayAppointmentDetails(appointment, role) {
             appointmentDetails.innerHTML = "";
 
             const appointmentDate = new Date(appointment.AppointmentDateTime);
@@ -261,12 +267,11 @@
             const appointmentDiv = document.createElement('div');
             const appointmentHeader = document.createElement('h6');
             appointmentHeader.textContent = `Date and Time : ${appointmentDate.getDate()}-${appointmentDate.getMonth() + 1}-${appointmentDate.getFullYear()} - ${appointmentDate.getHours()}:${appointmentDate.getMinutes()}`;
-            if (appointmentDate.getMinutes() === 0)
-            {
+            if (appointmentDate.getMinutes() === 0) {
                 appointmentHeader.textContent += "0";
-            }  
+            }
             appointmentDiv.appendChild(appointmentHeader);
-           
+
 
             const status = document.createElement('h6');
             status.textContent = `Status : ${appointment.Status}`;
@@ -275,17 +280,14 @@
             const notesHeader = document.createElement('h6');
             notesHeader.textContent = "Notes : ";
             const notes = document.createElement('p');
-            if(appointment.Notes === "")
-            {
+            if (appointment.Notes === "") {
                 notes.textContent = `no notes added`;
             }
-            else
-            {
+            else {
                 notes.textContent = appointment.Notes;
             }
 
-            if(role === "doctor")
-            {
+            if (role === "doctor") {
                 notes.id = "notes";
                 const notesText = document.createElement('textarea');
                 notesText.ariaPlaceholder = "write you notes..";
@@ -324,7 +326,7 @@
             email.textContent = `Email : ${appointment.PatientEmail}`;
             patientDiv.appendChild(email);
 
-            const address= document.createElement('h6');
+            const address = document.createElement('h6');
             address.textContent = `Address : ${appointment.PatientAddress}`;
             patientDiv.appendChild(address);
             appointmentDetails.appendChild(patientDiv);
@@ -356,25 +358,24 @@
             const doctorAddress = document.createElement('h6');
             doctorAddress.textContent = `Address : ${appointment.DoctorsDetail.Address}`;
             doctorDiv.appendChild(doctorAddress);
-           
+
             appointmentDetails.appendChild(doctorDiv);
 
-            if( appointment.Status === "scheduled")
-            {
+            if (appointment.Status === "scheduled") {
                 const cancelAppointmentButton = document.createElement('button');
                 cancelAppointmentButton.textContent = "Cancel Appointment";
                 cancelAppointmentButton.dataset.appointmentId = `${appointment.AppointmentId}`;
                 appointmentDetails.appendChild(cancelAppointmentButton);
-                cancelAppointmentButton.classList.add('button','cancel-appointment');
+                cancelAppointmentButton.classList.add('button', 'cancel-appointment');
             }
-             if (role === "doctor" && appointment.Status === "scheduled") {
+            if (role === "doctor" && appointment.Status === "scheduled") {
                 const completeAppointmentButton = document.createElement('button');
                 completeAppointmentButton.textContent = "Complete Appointment";
                 completeAppointmentButton.dataset.appointmentId = `${appointment.AppointmentId}`;
                 appointmentDetails.appendChild(completeAppointmentButton);
-                completeAppointmentButton.classList.add('button','complete-appointment');
+                completeAppointmentButton.classList.add('button', 'complete-appointment');
             }
-             
+
             // For Appointment details
             appointmentDiv.classList.add('appointment-container');
             appointmentHeader.classList.add('appointment-header');
@@ -425,10 +426,10 @@
 
                 filterButtons.forEach(function (button) {
                     $(button).removeClass('active');
-                
+
                 });
 
-               
+
                 $(this).addClass('active');
 
                 let appointmentCount = 0;
@@ -447,22 +448,22 @@
                     $('.no-appointments').hide();
                 }
             });
-             
+
             $(document).on("click", ".view", function () {
 
                 $("#appointmentDetailsModal").modal('show');
                 const appointmentId = $(this).data("appointment-id");
                 const modalTitle = document.querySelector('.modal-title');
                 modalTitle.innerHTML = "Appointment Details :";
-                
+
                 $.ajax({
                     url: "/Patient/ViewAppointment",
                     type: "GET",
                     data: { appointmentId: appointmentId },
                     success: function (response) {
-                       const appointment = JSON.parse(response);
+                        const appointment = JSON.parse(response);
                         console.log(appointment);
-                        displayAppointmentDetails(appointment,userRole);
+                        displayAppointmentDetails(appointment, userRole);
                         $("#appointmentDetailsModal").modal('show');
                     },
                     error: function (xhr, status, error) {
@@ -485,7 +486,7 @@
                     type: 'PUT',
                     data: {
                         appointmentId: appointmentId,
-                        notes:notes
+                        notes: notes
                     },
                     success: function (response) {
 
@@ -507,16 +508,16 @@
             //Cancel
             $(document).on("click", ".cancel-appointment", function () {
                 const appointmentId = $(this).data("appointment-id");
-               
+
 
                 $.ajax({
                     url: '/Patient/CancelAppointment',
                     type: 'PUT',
                     data: {
-                       appointmentId: appointmentId
+                        appointmentId: appointmentId
                     },
                     success: function () {
-                        
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Appointment Cancelled!',
@@ -529,7 +530,7 @@
                                 location.reload(true);
                             }
                         });;
-                        
+
                     },
                     error: function (xhr, status, error) {
                         console.error('Error booking appointment:', error);

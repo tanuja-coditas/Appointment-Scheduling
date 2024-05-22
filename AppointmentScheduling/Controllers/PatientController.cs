@@ -7,16 +7,20 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Repo;
+using Common;
 
 namespace AppointmentScheduling.Controllers
 {
     public class PatientController : Controller
     {
         private readonly PatientServices patientServices;
+        private readonly JwtToken _jwtToken;
 
-        public PatientController(PatientServices patientServices)
+        public PatientController(PatientServices patientServices,JwtToken jwtToken)
         {
             this.patientServices = patientServices;
+            _jwtToken = jwtToken;
         }
         [NoCache]
         [Authorize(Roles ="patient")]
@@ -27,25 +31,32 @@ namespace AppointmentScheduling.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles ="patient")]
+        [Authorize(Roles ="patient")] 
         public async Task<IActionResult> BookAppointment(Guid availabilityId,string doctorEmail)
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
-            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
             await patientServices.BookAppointment(usernameClaim.Value,doctorEmail,availabilityId);
             return Ok();
         }
 
-     
+        public async Task<IActionResult> AddAppointmentToWait(Guid availabilityId, string doctorEmail)
+        {
+            string jwtToken = HttpContext.Request.Cookies["JWTToken"];
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
+            await patientServices.BookAppointment(usernameClaim.Value, doctorEmail, availabilityId,true);
+            return Ok();
+        }
+
+
         [Authorize(Roles = "patient")]
         public IActionResult Appointments(string status="all")
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(jwtToken);
-            Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
+            var token = _jwtToken.GetToken(jwtToken);
+            var usernameClaim = token.Claims.FirstOrDefault(c => c.Type == "username");
             var username = usernameClaim.Value;
             var appointments = patientServices.GetAppointments(username);
             appointments = appointments.Where(appointment => appointment.Status.ToLower() == status.ToLower() || status.ToLower() == "all").ToList();
@@ -69,7 +80,7 @@ namespace AppointmentScheduling.Controllers
         [Authorize(Roles ="patient,doctor")]
         public async Task<IActionResult> CancelAppointment(Guid appointmentId)
         {
-            await patientServices.UpdateAppointmentStatus(appointmentId,"cancelled");
+            await patientServices.UpdateAppointmentStatus(appointmentId,Status.cancelled.ToString());
             return Ok();
         }
 
@@ -77,7 +88,7 @@ namespace AppointmentScheduling.Controllers
         [Authorize(Roles = "patient,doctor")]
         public async Task<IActionResult> CompleteAppointment(Guid appointmentId)
         {
-            await patientServices.UpdateAppointmentStatus(appointmentId,"completed");
+            await patientServices.UpdateAppointmentStatus(appointmentId,Status.completed.ToString());
             return Ok();
         }
 

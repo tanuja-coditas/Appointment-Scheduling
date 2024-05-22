@@ -123,7 +123,24 @@
             cursor: pointer;
         }
 
-            
+        .wait-btn {
+            background-color: teal;
+            color: #fff;
+            margin-left: 40px;
+            margin-bottom: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .count
+        {
+           
+            color: teal;
+            cursor: pointer;
+            font-size:12px;
+        }
 
     </style>
 
@@ -303,7 +320,8 @@
                 const timeSlots = obj.TimeSlots.$values.map(slot => ({
                     AvailabilityId : slot.AvailabilityId,
                     StartTime: slot.StartTime,
-                    EndTime: slot.EndTime
+                    EndTime: slot.EndTime,
+                    AppointmentCount:slot.AppointmentCount
                 }));
 
                 
@@ -323,6 +341,15 @@
         function displayAvailability(data,email) {
             availabilityResults.innerHTML = "";
             let f = 0;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            data = data.filter(day => {
+                const itemDate = new Date(day.Date);
+                itemDate.setHours(0, 0, 0, 0);
+                return itemDate >= today;
+            });
             data.forEach(day => {
                 f = 1;
                 const dateHeader = document.createElement('h6');
@@ -339,11 +366,36 @@
                     timeSlot.textContent = `${slot.StartTime} - ${slot.EndTime}`;
                     timeSlotsList.appendChild(timeSlot);
                     const bookButton = document.createElement('button');
+                  
                     bookButton.textContent = "Book Appointment";
+                    bookButton.classList.add('book-btn');
                     bookButton.dataset.availabilityId = `${slot.AvailabilityId}`;
                     bookButton.dataset.doctorEmail = email ;
-                    bookButton.classList.add('book-btn');
-                    timeSlot.appendChild(bookButton);
+                   
+                    if(slot.AppointmentCount === 0)
+                    {
+                        console.log("0-00");
+                        const p = document.createElement('p');
+                        p.textContent = "All the appointment booked";
+                        p.classList.add('count');
+                        timeSlot.appendChild(p);
+
+                        const waitListButton = document.createElement('button')
+                        waitListButton.textContent = "Add To Wait List";
+                        waitListButton.classList.add('wait-btn');
+                        waitListButton.dataset.availabilityId = `${slot.AvailabilityId}`;
+                        waitListButton.dataset.doctorEmail = email;
+
+                        //timeSlot.appendChild(waitListButton);
+
+
+                    }
+                    else
+                    {
+                        console.log("0-01");
+                        timeSlot.appendChild(bookButton);
+                    }
+                   
                     timeSlotsList.appendChild(timeSlot);
                 });
             });
@@ -415,6 +467,39 @@
                     error: function (xhr, status, error) {
                         console.error('Error booking appointment:', error);
                         
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while booking the appointment. Please try again later.',
+                            showCloseButton: true,
+                        });
+                    }
+                });
+            });
+
+            $(document).on("click", ".wait-btn", function () {
+                const availabilityId = $(this).data("availability-id");
+                const doctorEmail = $(this).data("doctor-email");
+
+                $.ajax({
+                    url: '/Patient/AddAppointmentToWait',
+                    type: 'POST',
+                    data: {
+                        availabilityId: availabilityId,
+                        doctorEmail: doctorEmail
+                    },
+                    success: function () {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Appointment Booked Successfully!',
+                            html: 'Your appointment has been added to waiting list , we will notify once appointment get scheduled.<br><a href="/Patient/Appointments">Check Your Appointments</a>',
+                            showCloseButton: true,
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error booking appointment:', error);
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',

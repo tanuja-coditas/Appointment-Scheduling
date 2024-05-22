@@ -5,6 +5,7 @@ using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using Common;
 using Microsoft.Extensions.Configuration;
+using Services.ServiceModels;
 namespace Services.AuthServices
 {
     public class Authentication
@@ -78,6 +79,25 @@ namespace Services.AuthServices
             user.PasswordSalt = passwordSalt;
             userRepo.UpdateUser();
             
+        }
+
+        public ProfileDTO GetProfile(string username)
+        {
+            var user = userRepo.GetUser(username);
+            
+            var role = roleRepo.GetRoleName(user.RoleId);
+            var profile = new ProfileDTO()
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                Role = role,
+                ImagePath = user.UserImage
+            };
+            return profile;
         }
     }
 }

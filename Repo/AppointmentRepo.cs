@@ -16,14 +16,14 @@ namespace Repo
             _context = context;
         }
 
-        public async Task Create(Guid patientId, Guid doctorId, DateTime appointmenDateTime)
+        public async Task Create(Guid patientId, Guid doctorId, DateTime appointmenDateTime, bool isWaiting = false)
         {
             var appointment = new TblAppointment()
             {
                 PatientId = patientId,
                 DoctorId = doctorId,
-                AppointmentStatus = "scheduled",
-                Notes = "",
+                AppointmentStatus = isWaiting?Status.waiting.ToString(): Status.scheduled.ToString(),
+                Notes = string.Empty,
                 AppointmentDatetime = appointmenDateTime
             };
             await _context.TblAppointments.AddAsync(appointment);
