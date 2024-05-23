@@ -16,8 +16,13 @@ namespace Repo
             _context = context;
         }
 
-        public async Task Create(TblWaitlist waitlist)
+        public async Task Create(Guid appointmentId, DateOnly date)
         {
+            var waitlist = new TblWaitlist()
+            {
+                WaitlistDate = date,
+                AppointmentId = appointmentId
+            };
             await _context.TblWaitlists.AddAsync(waitlist);
             await _context.SaveChangesAsync();
         }

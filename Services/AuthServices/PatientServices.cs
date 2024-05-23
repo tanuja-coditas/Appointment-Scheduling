@@ -18,12 +18,16 @@ namespace Services.AuthServices
         private readonly AvailabilityRepo availabilityRepo;
         private readonly AppointmentRepo appointmentRepo;
         private readonly SpecializationRepo specializationRepo;
+        private readonly WaitListRepo waitListRepo;
+        public PatientServices(UserRepo userRepo,AvailabilityRepo availabilityRepo,AppointmentRepo appointmentRepo,
+            SpecializationRepo specializationRepo,WaitListRepo waitListRepo)
+        {
 
-        public PatientServices(UserRepo userRepo,AvailabilityRepo availabilityRepo,AppointmentRepo appointmentRepo,SpecializationRepo specializationRepo) {
             this.userRepo = userRepo;
             this.availabilityRepo = availabilityRepo;
             this.appointmentRepo = appointmentRepo;
             this.specializationRepo = specializationRepo;
+            this.waitListRepo = waitListRepo;
         }
 
         public async Task BookAppointment(string username, string doctorEmail, Guid availabilityId,bool isWaiting = false)
@@ -31,14 +35,11 @@ namespace Services.AuthServices
             var user = userRepo.GetUser(username);
             var doctor = userRepo.GetUser(doctorEmail);
             var datetime = availabilityRepo.UpdateAvailability(availabilityId,isWaiting);
-            appointmentRepo.Create(user.UserId, doctor.UserId, datetime,isWaiting);
+            var appointment = await appointmentRepo.Create(user.UserId, doctor.UserId, datetime,isWaiting);
             if(isWaiting)
             {
-                var waitlist = new TblWaitlist()
-                {
-                   // WaitlistDate = datetime.ToString("yyyy-MM-dd"),  
+               await waitListRepo.Create(appointment.AppointmentId, DateOnly.Parse(datetime.ToString("yyyy-MM-dd")));
 
-                };
             }
         }
 

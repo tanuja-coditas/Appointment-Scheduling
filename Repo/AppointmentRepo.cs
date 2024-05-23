@@ -16,7 +16,7 @@ namespace Repo
             _context = context;
         }
 
-        public async Task Create(Guid patientId, Guid doctorId, DateTime appointmenDateTime, bool isWaiting = false)
+        public async Task<TblAppointment> Create(Guid patientId, Guid doctorId, DateTime appointmenDateTime, bool isWaiting = false)
         {
             var appointment = new TblAppointment()
             {
@@ -28,6 +28,8 @@ namespace Repo
             };
             await _context.TblAppointments.AddAsync(appointment);
             await _context.SaveChangesAsync();
+            return appointment;
+
         }
 
         public List<TblAppointment> GetPatientAppointments(Guid patientID)
