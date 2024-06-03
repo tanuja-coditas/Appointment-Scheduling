@@ -16,9 +16,4 @@ public partial class TblAvailability
     public int AppointmentCount { get; set; }
 
     public virtual TblUser Doctor { get; set; } = null!;
-
-    public TblAvailability()
-    {
-        AvailabilityId = Guid.NewGuid();
-    }
 }

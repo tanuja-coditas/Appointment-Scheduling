@@ -22,9 +22,4 @@ public partial class TblAppointment
     public virtual TblUser Patient { get; set; } = null!;
 
     public virtual ICollection<TblWaitlist> TblWaitlists { get; set; } = new List<TblWaitlist>();
-
-    public TblAppointment()
-    {
-        AppointmentId = Guid.NewGuid();
-    }
 }

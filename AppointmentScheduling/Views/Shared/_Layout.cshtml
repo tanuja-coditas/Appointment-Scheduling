@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Common 
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var userRole = TokenHelper.GetUserRole(HttpContextAccessor);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -74,7 +80,7 @@
             background: #000;
             box-shadow: 0 8px 0 #000, 0 -8px 0 #000;
         }
-    /* profile menu */
+   
     .profile {
         position: relative;
         display: flex;
@@ -110,7 +116,7 @@
                 height: 100%;
                 object-fit: cover;
             }
-    /* menu (the right one) */
+    
     .menu {
         position: absolute;
         top: calc(100% + 24px);
@@ -131,7 +137,7 @@
             transform: translateY(0);
             visibility: visible;
         }
-        /* menu links */
+       
         .menu ul {
             position: relative;
             display: flex;
@@ -173,12 +179,36 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                         @if(userRole =="patient")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Patient/Index"><span style="color:white;">Home</span></a>
+                            </li>
 
-                        @RenderSection("Navigation", required: false)
-                      
-                        <!--li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#"><span style="color:white;">Notifications</span></a>
-                        </li-->
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Patient/Appointments"><span style="color:white;">Appointments</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Chat/Chats"><span style="color:white;">Chats</span></a>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Doctor/Index"><span style="color:white;">Home</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Doctor/Availability"><span style="color:white;">Availability</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Doctor/Appointments"><span style="color:white;">Appointments</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/Chat/Chats  "><span style="color:white;">Chats</span></a>
+                            </li>
+                        }
+
                     </ul>
                 </div>
                    

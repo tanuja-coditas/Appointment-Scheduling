@@ -1,0 +1,120 @@
+﻿@model Services.ServiceModels.DoctorVerificationModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #008080;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #008080;
+        }
+
+        .form-control, .form-control-file {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-control-file {
+            padding: 3px;
+        }
+
+        .btn-primary {
+            background-color: #008080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: #006666;
+        }
+
+        .text-danger {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Doctor Verification</h2>
+        <form asp-action="SubmitVerificationDocuments" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label asp-for="Specialization" class="control-label"></label>
+                <input asp-for="Specialization" class="form-control" />
+                <span asp-validation-for="Specialization" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MedicalLicense" class="control-label"></label>
+                <input asp-for="MedicalLicense" type="file" class="form-control-file" />
+                <span asp-validation-for="MedicalLicense" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IdProof" class="control-label"></label>
+                <input asp-for="IdProof" type="file" class="form-control-file" />
+                <span asp-validation-for="IdProof" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MedicalDegreeCertificate" class="control-label"></label>
+                <input asp-for="MedicalDegreeCertificate" type="file" class="form-control-file" />
+                <span asp-validation-for="MedicalDegreeCertificate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PostgraduateMedicalDegreeCertificate" class="control-label"></label>
+                <input asp-for="PostgraduateMedicalDegreeCertificate" type="file" class="form-control-file" />
+                <span asp-validation-for="PostgraduateMedicalDegreeCertificate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SpecializationCertificate" class="control-label"></label>
+                <input asp-for="SpecializationCertificate" type="file" class="form-control-file" />
+                <span asp-validation-for="SpecializationCertificate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

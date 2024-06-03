@@ -22,9 +22,4 @@ public partial class TblMessage
     public Guid RecieverId { get; set; }
 
     public virtual TblChatroom Chatroom { get; set; } = null!;
-
-    public TblMessage()
-    {
-        MessageId = Guid.NewGuid();
-    }
 }

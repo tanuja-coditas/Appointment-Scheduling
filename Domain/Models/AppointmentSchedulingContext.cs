@@ -21,13 +21,11 @@ public partial class AppointmentSchedulingContext : DbContext
 
     public virtual DbSet<TblChatroom> TblChatrooms { get; set; }
 
-    public virtual DbSet<TblDoctorHospital> TblDoctorHospitals { get; set; }
-
     public virtual DbSet<TblDoctorSpecialization> TblDoctorSpecializations { get; set; }
 
-    public virtual DbSet<TblDocument> TblDocuments { get; set; }
+    public virtual DbSet<TblDoctorVerification> TblDoctorVerifications { get; set; }
 
-    public virtual DbSet<TblHospital> TblHospitals { get; set; }
+    public virtual DbSet<TblDocument> TblDocuments { get; set; }
 
     public virtual DbSet<TblMessage> TblMessages { get; set; }
 
@@ -123,26 +121,6 @@ public partial class AppointmentSchedulingContext : DbContext
                 .HasConstraintName("FK__tbl_chatr__patie__46E78A0C");
         });
 
-        modelBuilder.Entity<TblDoctorHospital>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("tbl_doctor_hospital");
-
-            entity.Property(e => e.DoctorId).HasColumnName("doctor_id");
-            entity.Property(e => e.HospitalId).HasColumnName("hospital_id");
-
-            entity.HasOne(d => d.Doctor).WithMany()
-                .HasForeignKey(d => d.DoctorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tbl_docto__docto__5CD6CB2B");
-
-            entity.HasOne(d => d.Hospital).WithMany()
-                .HasForeignKey(d => d.HospitalId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tbl_docto__hospi__5DCAEF64");
-        });
-
         modelBuilder.Entity<TblDoctorSpecialization>(entity =>
         {
             entity
@@ -161,6 +139,21 @@ public partial class AppointmentSchedulingContext : DbContext
                 .HasForeignKey(d => d.SpecializationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__tbl_docto__speci__6383C8BA");
+        });
+
+        modelBuilder.Entity<TblDoctorVerification>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tbl_doct__3214EC078F428CD8");
+
+            entity.ToTable("tbl_doctor_verification");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.VerificationDate).HasColumnType("datetime");
+            entity.Property(e => e.VerifiedBy).HasMaxLength(128);
+
+            entity.HasOne(d => d.Doctor).WithMany(p => p.TblDoctorVerifications)
+                .HasForeignKey(d => d.DoctorId)
+                .HasConstraintName("FK__tbl_docto__Docto__6FE99F9F");
         });
 
         modelBuilder.Entity<TblDocument>(entity =>
@@ -185,25 +178,6 @@ public partial class AppointmentSchedulingContext : DbContext
                 .HasForeignKey(d => d.DoctorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__tbl_docum__docto__4CA06362");
-        });
-
-        modelBuilder.Entity<TblHospital>(entity =>
-        {
-            entity.HasKey(e => e.HospitalId).HasName("PK__tbl_hosp__DFF4167F26AB399C");
-
-            entity.ToTable("tbl_hospital");
-
-            entity.Property(e => e.HospitalId)
-                .ValueGeneratedNever()
-                .HasColumnName("hospital_id");
-            entity.Property(e => e.Address).HasColumnName("address");
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .HasColumnName("name");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("phone_number");
         });
 
         modelBuilder.Entity<TblMessage>(entity =>

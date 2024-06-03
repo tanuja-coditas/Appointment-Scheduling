@@ -123,6 +123,17 @@
             cursor: pointer;
         }
 
+        .chat-btn {
+            background-color: teal;
+            color: #fff;
+            margin-left: 40px;
+            margin-top:5px;
+            margin-bottom: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
         .wait-btn {
             background-color: teal;
             color: #fff;
@@ -147,18 +158,7 @@
 </head>
 <body>
 
-    @section Navigation {
-
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Patient/Index"><span style="color:white;">Home</span></a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Patient/Appointments"><span style="color:white;">Appointments</span></a>
-        </li>
-
-    }
-
+   
     <section style=" padding-top: 5px;">
       <div class = "hero">
         <div class="bottom-text">
@@ -288,6 +288,7 @@
                                                 <p class="card-text">${doctor.PhoneNumber}</p>
                                                 <p class="card-text">${doctor.Address}</p>
                                                 <button class="check-availability-btn" data-doctor-email="${doctor.Email}" data-doctor-name="${doctor.FirstName} ${doctor.LastName}">Check Availability</button>
+                                                        <button class="chat-btn" data-name="${doctor.FirstName} ${doctor.LastName}" data-doctor-email="${doctor.Email}">Chat</button>
                                     </div>
                                 </div>
                             </div>
@@ -434,6 +435,29 @@
 
             $(".close").click(function () {
                 $("#availabilityModal").hide();
+            });
+
+
+
+            $(document).on("click", ".chat-btn", function () {
+
+                
+                const doctor = $(this).data("doctor-email");
+                const name = $(this).data("name");
+                $.ajax({
+                    url: "/Auth/GetLoggedInUser",
+                    type: "GET",
+                    success: function (response) {
+                        const user = JSON.parse(response);
+                        const patient = user.UserName;
+                        const url = `/Chat/Chats?name=${name}&email=${doctor}`;
+                        window.location.href = url;
+
+                    },
+                    error: function (xhr, status, error) {
+
+                    }
+                });
             });
         });
    

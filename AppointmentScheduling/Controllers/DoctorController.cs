@@ -32,6 +32,10 @@ namespace AppointmentScheduling.Controllers
             return View();
         }
 
+        public IActionResult DoctorVerification()
+        {
+            return View();
+        }
 
         [HttpGet]
         [Route("/Doctor/GetDoctors")]

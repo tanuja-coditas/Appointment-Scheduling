@@ -14,9 +14,4 @@ public partial class TblDocument
     public string? FilePath { get; set; }
 
     public virtual TblUser Doctor { get; set; } = null!;
-
-    public TblDocument()
-    {
-        DocumentId = Guid.NewGuid();
-    }
 }

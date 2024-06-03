@@ -10,6 +10,7 @@ using Services.AuthServices;
 using System.Net;
 using System.Text;
 using common;
+using AppointmentScheduling.Hubs;
 
 namespace AppointmentScheduling
 {
@@ -38,6 +39,9 @@ namespace AppointmentScheduling
             builder.Services.AddTransient<WaitListRepo>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddTransient<PatientServices>();
+            builder.Services.AddTransient<ChatRepo>();
+            builder.Services.AddTransient<ChatServices>();
+            builder.Services.AddSignalR();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -95,7 +99,7 @@ namespace AppointmentScheduling
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Auth}/{action=Login}/{id?}");
-
+            app.MapHub<ChatHub>("/chathub");
             app.Run();
         }
     }

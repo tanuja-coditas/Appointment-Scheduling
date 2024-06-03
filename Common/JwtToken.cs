@@ -59,4 +59,23 @@ namespace Common
         }
 
     }
+    public static class TokenHelper
+    {
+        public static string GetUserRole(IHttpContextAccessor httpContextAccessor)
+        {
+            var token = httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            var roleClaim = jwtToken?.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role)?.Value;
+
+            return roleClaim;
+        }
+    }
 }

@@ -19,37 +19,7 @@
 </head>
 <body>
 
-    @if (@Model.Role == "doctor")
-    {
-        @section Navigation {
-
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Doctor/Index"><span style="color:white;">Home</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Doctor/Availability"><span style="color:white;">Availability</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Doctor/Appointments"><span style="color:white;">Appointments</span></a>
-        </li>
-      
-
-        }
-    }
-    else
-    {
-        @section Navigation {
-
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Patient/Index"><span style="color:white;">Home</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/Patient/Appointments"><span style="color:white;">Appointments</span></a>
-        </li>
-      
-
-        }
-    }
+   
 
     <div class="card">
         <div class="card-img-top">

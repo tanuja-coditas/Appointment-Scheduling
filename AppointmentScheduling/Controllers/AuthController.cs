@@ -83,7 +83,9 @@ namespace AppointmentScheduling.Controllers
 
                 await authentication.RegisterUser(model);
                 TempData["SuccessMessage"] = "User registered successfully.";
-                return RedirectToAction("Login", "Auth");
+                if(model.Role == Roles.patient.ToString())
+                    return RedirectToAction("Login", "Auth");
+                return RedirectToAction("DoctorVerification", "Auth");
             }
 
         }
