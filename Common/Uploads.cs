@@ -35,5 +35,23 @@ namespace Common
             }
             return "/ProfileImages/default-profile.png";
         }
+        public async Task<string> UploadDocument(IFormFile document)
+        {
+            if (document != null && document.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Documents");
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + document.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await document.CopyToAsync(fileStream);
+                }
+
+
+                return "/Documents/" + uniqueFileName;
+            }
+            return "";
+        }
     }
 }

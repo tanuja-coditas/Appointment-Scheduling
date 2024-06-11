@@ -50,4 +50,9 @@ public partial class TblUser
     public virtual ICollection<TblDoctorVerification> TblDoctorVerifications { get; set; } = new List<TblDoctorVerification>();
 
     public virtual ICollection<TblDocument> TblDocuments { get; set; } = new List<TblDocument>();
+
+    public TblUser()
+    {
+        UserId = Guid.NewGuid();
+    }
 }

@@ -16,4 +16,9 @@ public partial class TblDoctorVerification
     public string? VerifiedBy { get; set; }
 
     public virtual TblUser? Doctor { get; set; }
+
+    public TblDoctorVerification()
+    {
+        Id = Guid.NewGuid();
+    }
 }

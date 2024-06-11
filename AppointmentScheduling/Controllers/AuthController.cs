@@ -85,7 +85,8 @@ namespace AppointmentScheduling.Controllers
                 TempData["SuccessMessage"] = "User registered successfully.";
                 if(model.Role == Roles.patient.ToString())
                     return RedirectToAction("Login", "Auth");
-                return RedirectToAction("DoctorVerification", "Auth");
+                return RedirectToAction("DoctorVerification", "Doctor", new { username = model.UserName});
+
             }
 
         }
@@ -122,9 +123,27 @@ namespace AppointmentScheduling.Controllers
                         SameSite = SameSiteMode.Strict
                     };
                     HttpContext.Response.Cookies.Append("JWTToken", token, cookieOptions);
-                    if (role == "patient") 
+                    if (role == Roles.patient.ToString()) 
                         return RedirectToAction("Index", "Patient");
-                     return RedirectToAction("Index", "Doctor");
+                    else if(role == Roles.doctor.ToString())
+                    {
+                        var isVerified = authentication.IsVerified(user);
+                        if (isVerified == null)
+                        {
+
+                            return RedirectToAction("DoctorVerification", "Doctor", new { username = user.UserName });
+                        }
+                        else if (isVerified == true)
+                            return RedirectToAction("Index", "Doctor");
+                        else
+                            return RedirectToAction("VerificationStatus", "Doctor");
+                       
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+                     
                 }
                 TempData["ErrorMessage"] = "Login Failed!";
                 return RedirectToAction("Login", "Auth");

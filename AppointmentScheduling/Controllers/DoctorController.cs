@@ -11,6 +11,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Common;
+using Repo;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
+using common;
 
 namespace AppointmentScheduling.Controllers
 {
@@ -18,12 +21,14 @@ namespace AppointmentScheduling.Controllers
     {
         private readonly DoctorServices _doctorServices;
         private readonly JwtToken _jwtToken;
+        private readonly Authentication _authentication;
 
         // GET: DoctorController
-        public DoctorController(DoctorServices doctorServices,JwtToken jwtToken)
+        public DoctorController(DoctorServices doctorServices,JwtToken jwtToken,Authentication authentication)
         {
             _doctorServices = doctorServices;
             _jwtToken = jwtToken;
+            _authentication = authentication;
         }
 
         [Authorize(Roles ="doctor")]
@@ -32,7 +37,76 @@ namespace AppointmentScheduling.Controllers
             return View();
         }
 
-        public IActionResult DoctorVerification()
+        public IActionResult DoctorVerification(string username)
+        {
+            var doctorVerifiaction = new DoctorVerificationModel() { UserName = username };
+
+            return View(doctorVerifiaction);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> DoctorVerification(DoctorVerificationModel model)
+        {
+          
+            if (model.MedicalLicense != null)
+            {
+                string fileExtension = Path.GetExtension(model.MedicalLicense.FileName);
+                if (fileExtension != ".pdf")
+                {
+                    ModelState.AddModelError("MedicalLicense", "Please select a file with .pdf extension");
+                }
+            }
+            if (model.IdProof != null)
+            {
+                string fileExtension = Path.GetExtension(model.IdProof.FileName);
+                if (fileExtension != ".pdf")
+                {
+                    ModelState.AddModelError("IdProof", "Please select a file with .pdf extension");
+                }
+            }
+            if (model.MedicalDegreeCertificate != null)
+            {
+                string fileExtension = Path.GetExtension(model.MedicalDegreeCertificate.FileName);
+                if (fileExtension != ".pdf")
+                {
+                    ModelState.AddModelError("MedicalDegreeCertificate", "Please select a file with .pdf extension");
+                }
+            }
+            if (model.PostgraduateMedicalDegreeCertificate != null)
+            {
+                string fileExtension = Path.GetExtension(model.PostgraduateMedicalDegreeCertificate.FileName);
+                if (fileExtension != ".pdf")
+                {
+                    ModelState.AddModelError("PostgraduateMedicalDegreeCertificate", "Please select a file with .pdf extension");
+                }
+            }
+            if (model.SpecializationCertificate != null)
+            {
+                string fileExtension = Path.GetExtension(model.SpecializationCertificate.FileName);
+                if (fileExtension != ".pdf")
+                {
+                    ModelState.AddModelError("SpecializationCertificate", "Please select a file with .pdf extension");
+                }
+            }
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
+
+                return View(model);
+            }
+            else
+            {
+               await  _authentication.Verify(model);
+                return View("VerificationStatus");
+            }
+            
+        }
+
+        public IActionResult VerificationStatus()
         {
             return View();
         }

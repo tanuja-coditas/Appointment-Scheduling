@@ -12,4 +12,9 @@ public partial class TblWaitlist
     public Guid AppointmentId { get; set; }
 
     public virtual TblAppointment Appointment { get; set; } = null!;
+
+    public TblWaitlist()
+    {
+        WaitlistId = Guid.NewGuid();    
+    }
 }

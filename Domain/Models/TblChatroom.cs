@@ -16,4 +16,9 @@ public partial class TblChatroom
     public virtual TblUser Patient { get; set; } = null!;
 
     public virtual ICollection<TblMessage> TblMessages { get; set; } = new List<TblMessage>();
+
+    public TblChatroom()
+    {
+        ChatroomId= Guid.NewGuid();
+    }
 }

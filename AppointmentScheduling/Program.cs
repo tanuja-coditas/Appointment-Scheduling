@@ -40,7 +40,10 @@ namespace AppointmentScheduling
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddTransient<PatientServices>();
             builder.Services.AddTransient<ChatRepo>();
-            builder.Services.AddTransient<ChatServices>();
+            builder.Services.AddTransient<ChatServices>(); 
+            builder.Services.AddTransient<DoctorVerificationRepo>();
+            builder.Services.AddTransient<DocumentRepo>();
+            builder.Services.AddTransient<AdminServices>();
             builder.Services.AddSignalR();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

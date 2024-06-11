@@ -8,4 +8,6 @@ namespace Repo
 {
     public enum Roles { patient,doctor,admin}
     public enum Status { scheduled,cancelled,completed,waiting,unknown}
+
+    public enum DocumentType {MedicalLicense,IdProof, MedicalDegreeCertificate, PostgraduateMedicalDegreeCertificate, SpecializationCertificate }
 }

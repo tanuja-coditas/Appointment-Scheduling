@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using Common;
 using Microsoft.Extensions.Configuration;
 using Services.ServiceModels;
+using Microsoft.IdentityModel.Tokens;
 namespace Services.AuthServices
 {
     public class Authentication
@@ -15,14 +16,18 @@ namespace Services.AuthServices
         private readonly IConfiguration config;
         private readonly Encryption encryption;
         private readonly Uploads uploads;
+        private readonly DoctorVerificationRepo doctorVerificationRepo;
+        private readonly DocumentRepo documentRepo;
 
-        public Authentication(UserRepo userRepo,RoleRepo roleRepo,IConfiguration config,Encryption encryption,Uploads uploads)
+        public Authentication(UserRepo userRepo,RoleRepo roleRepo,IConfiguration config,Encryption encryption,Uploads uploads,DoctorVerificationRepo doctorVerificationRepo,DocumentRepo documentRepo)
         {
             this.userRepo = userRepo;
             this.roleRepo = roleRepo;
             this.config = config;
             this.encryption = encryption;   
             this.uploads = uploads;
+            this.doctorVerificationRepo = doctorVerificationRepo;
+            this.documentRepo = documentRepo;
         }
 
         public  async Task RegisterUser(RegisterModel model)
@@ -98,6 +103,45 @@ namespace Services.AuthServices
                 ImagePath = user.UserImage
             };
             return profile;
+        }
+
+        public bool? IsVerified(TblUser user)
+        {
+            var isVerified = doctorVerificationRepo.IsVerified(user.UserId);
+            return isVerified;
+        }
+
+        public async Task Verify(DoctorVerificationModel model)
+        {
+            var doctor = userRepo.GetUser(model.UserName);
+            var medicalLicensePath = await uploads.UploadDocument(model.MedicalLicense);
+            var idProofPath = await uploads.UploadDocument(model.IdProof);
+            var medicalDegreeCertificatePath = await uploads.UploadDocument(model.MedicalDegreeCertificate);
+            var postgraduateMedicalDegreeCertificatePath = await uploads.UploadDocument(model.PostgraduateMedicalDegreeCertificate);
+            var specializationCertificatePath = await uploads.UploadDocument(model.SpecializationCertificate);
+
+            var medicalLicense = new TblDocument() { DocumentType = DocumentType.MedicalLicense.ToString(), FilePath = medicalLicensePath, DoctorId = doctor.UserId };
+            var idProof = new TblDocument() { DocumentType = DocumentType.IdProof.ToString(), FilePath = idProofPath, DoctorId = doctor.UserId };
+            var medicalDegreeCertificate = new TblDocument() { DocumentType = DocumentType.MedicalDegreeCertificate.ToString(), FilePath = medicalDegreeCertificatePath, DoctorId = doctor.UserId };
+
+            await documentRepo.AddDocument(medicalLicense);
+            await documentRepo.AddDocument(idProof);
+            await documentRepo.AddDocument(medicalDegreeCertificate);
+
+            if (!postgraduateMedicalDegreeCertificatePath.IsNullOrEmpty())
+            { 
+                var postgraduateMedicalDegreeCertificate = new TblDocument() { DocumentType = DocumentType.PostgraduateMedicalDegreeCertificate.ToString(),FilePath = postgraduateMedicalDegreeCertificatePath,DoctorId=doctor.UserId };
+                await documentRepo.AddDocument(postgraduateMedicalDegreeCertificate);
+            }
+
+            if (!specializationCertificatePath.IsNullOrEmpty())
+            {
+                var specializationCertificate = new TblDocument() { DocumentType = DocumentType.SpecializationCertificate.ToString(), FilePath = specializationCertificatePath, DoctorId = doctor.UserId };
+                await documentRepo.AddDocument(specializationCertificate);
+            }
+
+            var verification = new TblDoctorVerification() { DoctorId = doctor.UserId, IsVerified = false };
+            await doctorVerificationRepo.AddVerification(verification);
         }
     }
 }
