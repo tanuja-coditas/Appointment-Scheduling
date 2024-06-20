@@ -48,6 +48,7 @@ namespace AppointmentScheduling.Controllers
         public IActionResult Doctors()
         {
             var doctors = _adminServices.GetDoctors();
+            return View(doctors);
         }
     }
 }

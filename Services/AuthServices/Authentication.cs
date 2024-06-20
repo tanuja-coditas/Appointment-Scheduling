@@ -7,6 +7,8 @@ using Common;
 using Microsoft.Extensions.Configuration;
 using Services.ServiceModels;
 using Microsoft.IdentityModel.Tokens;
+using System.Numerics;
+using Microsoft.DiaSymReader;
 namespace Services.AuthServices
 {
     public class Authentication
@@ -99,7 +101,6 @@ namespace Services.AuthServices
                 LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                Role = role,
                 ImagePath = user.UserImage
             };
             return profile;
@@ -142,6 +143,23 @@ namespace Services.AuthServices
 
             var verification = new TblDoctorVerification() { DoctorId = doctor.UserId, IsVerified = false };
             await doctorVerificationRepo.AddVerification(verification);
+
+        }
+
+        public async Task<TblUser> UpdateProfile(ProfileDTO model)
+        {
+            var user = userRepo.GetUser(model.UserName);
+            if(model.ImageFile != null) {
+                string imagePath = await uploads.UploadImage(model.ImageFile);
+                user.UserImage = imagePath;
+            }
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Address = model.Address;
+            user.PhoneNumber = model.PhoneNumber;
+            
+            userRepo.UpdateUser();
+            return user;
         }
     }
 }

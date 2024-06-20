@@ -14,6 +14,8 @@ using Common;
 using Repo;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using common;
+using Domain.Models;
+using System.Numerics;
 
 namespace AppointmentScheduling.Controllers
 {
@@ -37,10 +39,9 @@ namespace AppointmentScheduling.Controllers
             return View();
         }
 
-        public IActionResult DoctorVerification(string username)
+        public  IActionResult DoctorVerification(string username)
         {
             var doctorVerifiaction = new DoctorVerificationModel() { UserName = username };
-
             return View(doctorVerifiaction);
         }
         

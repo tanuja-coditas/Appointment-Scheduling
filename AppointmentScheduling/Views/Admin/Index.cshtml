@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Admin dashboard</title>
+        
     <style>
         main{
             padding-left:0px !important;
@@ -57,7 +57,7 @@
                 <tr>
                     <th>Serial Number</th>
                     <th>Image</th>
-                    <th>Username</th>
+                   
                     <th>Name</th>
                     <th>Email</th>
                     <th>Address</th>
@@ -74,7 +74,7 @@
                     <tr>
                         <td>@(i + 1)</td>
                         <td><img class="image" src="@user.ImagePath" /></td>
-                        <td>@user.Username</td>
+                    
                         <td>@user.Name</td>
                         <td>@user.Email</td>
                         <td>@user.Address</td>
@@ -106,13 +106,29 @@
                             </div>
                         </td>
                         <td>
-                            
-                                <input type="text" id="specialization-@user.Username" placeholder="Enter Specialization" />
+
+                            <select id="specialization-@user.Username" name="specialization-@user.Username">
+                                <option value="">Search..</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Psychiatry">Psychiatry</option>
+                                <option value="Radiology">Radiology</option>
+                            </select>
                            
                         </td>
                         <td>
-                           
-                                <input type="text" id="degree-@user.Username" placeholder="Enter Degree" />
+
+                            <select id="degree-@user.Username" name="degree-@user.Username">
+                                <option value="">Search..</option>
+                                <option value="MBBS">MBBS</option>
+                                <option value="MD">MD</option>
+                                <option value="DO">MBBS,MS</option>
+                                <option value="PhD">MBBS,MD</option>
+                                <option value="MS">MS</option>
+                                <option value="BDS">BDS</option>
+                            </select>
                             
                         </td>
                         <td>

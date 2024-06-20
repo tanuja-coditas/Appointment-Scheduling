@@ -37,7 +37,6 @@ namespace Common
                 new Claim(ClaimTypes.NameIdentifier,user.UserName),
                 new Claim(ClaimTypes.Role,Role),
                 new Claim("username",user.UserName),
-                new Claim("imagePath",user.UserImage)
                 
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],

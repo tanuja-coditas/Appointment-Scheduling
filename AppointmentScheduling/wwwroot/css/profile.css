@@ -70,3 +70,10 @@
     background-color: whitesmoke;
     height: 150px;
 }
+hr{
+    background:black;
+}
+.edit{
+    float:right;
+    font-size:5px;
+}

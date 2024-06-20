@@ -18,7 +18,7 @@ namespace Services.AuthServices
         private readonly UserRepo _userRepo;
         private readonly DoctorVerificationRepo _doctorVerificationRepo;
         private readonly DocumentRepo _documentRepo;
-        private readonly SpecializationRepo _specialiazationRepo;
+        private readonly SpecializationRepo _specializationRepo;
         private readonly Email _email;
 
         public AdminServices(UserRepo userRepo, DoctorVerificationRepo doctorVerificationRepo,DocumentRepo documentRepo,SpecializationRepo specializationRepo,Email email)
@@ -26,7 +26,7 @@ namespace Services.AuthServices
             _userRepo = userRepo;
             _doctorVerificationRepo = doctorVerificationRepo;
             _documentRepo = documentRepo;
-            _specialiazationRepo = specializationRepo;
+            _specializationRepo = specializationRepo;
             _email = email;
 
         }
@@ -66,14 +66,14 @@ namespace Services.AuthServices
                              SpecializationCertificate= document.FirstOrDefault(d => d.DocumentType == DocumentType.SpecializationCertificate.ToString())?.FilePath,
                              Verify = doctor.Verify
                          };
-            return result.ToList();
+            return result.OrderBy(doctor => doctor.Username).ThenBy(doctor=> doctor.Name).ToList();
         }
 
         public async Task VerifyDoctor(string username,string specialization,string degree,string admin)
         {
-           var specializationId = await _specialiazationRepo.AddSpecialization(specialization, degree);
+           var specializationId = await _specializationRepo.AddSpecialization(specialization, degree);
            var doctor = _userRepo.GetUser(username);
-           await _specialiazationRepo.MapDoctorSpecialization(doctor.UserId, specializationId);
+           await _specializationRepo.MapDoctorSpecialization(doctor.UserId, specializationId);
           
            await  _doctorVerificationRepo.Verify(doctor.UserId,admin);
 
@@ -96,7 +96,7 @@ namespace Services.AuthServices
                                                                                     Address = patient.Address,
                                                                                     ImagePath = patient.UserImage
                                                                                 });
-            return patients.ToList();
+            return patients.OrderBy(patient => patient.Username).ThenBy(patient => patient.FirstName).ToList();
 
         }
 
@@ -108,6 +108,8 @@ namespace Services.AuthServices
             var query1 = from doctor in doctors
                          join verification in doctorVerification
                          on doctor.UserId equals verification.DoctorId
+                         into ds
+                         from s in ds.DefaultIfEmpty()
                          select new
                          {
                              Id = doctor.UserId,
@@ -116,28 +118,64 @@ namespace Services.AuthServices
                              Name = doctor.FirstName + " " + doctor.LastName,
                              Email = doctor.Email,
                              Address = doctor.Address,
-                             Verify = verification.IsVerified
+                             Verify = s == null ? false : s.IsVerified
                          };
-            var result = from doctor in query1
+            var query2 = from doctor in query1
                          join document in documents
                          on doctor.Id equals document.Key
-                         select new VerificationDTO()
+                         into ds
+                         from s in ds.DefaultIfEmpty()
+                         select new 
                          {
-
+                             DoctorId = doctor.Id,
                              Username = doctor.Username,
                              ImagePath = doctor.ImagePath,
                              Name = doctor.Name,
                              Email = doctor.Email,
                              Address = doctor.Address,
-                             MedicalLicense = document.FirstOrDefault(d => d.DocumentType == DocumentType.MedicalLicense.ToString())?.FilePath,
-                             IdProof = document.FirstOrDefault(d => d.DocumentType == DocumentType.IdProof.ToString())?.FilePath,
-                             MedicalDegreeCertificate = document.FirstOrDefault(d => d.DocumentType == DocumentType.MedicalDegreeCertificate.ToString())?.FilePath,
-                             PostgraduateMedicalDegreeCertificate = document.FirstOrDefault(d => d.DocumentType == DocumentType.PostgraduateMedicalDegreeCertificate.ToString())?.FilePath,
-                             SpecializationCertificate = document.FirstOrDefault(d => d.DocumentType == DocumentType.SpecializationCertificate.ToString())?.FilePath,
+                             MedicalLicense = s == null ? "" : s.FirstOrDefault(d => d.DocumentType == DocumentType.MedicalLicense.ToString())?.FilePath,
+                             IdProof =  s == null ? "" : s.FirstOrDefault(d => d.DocumentType == DocumentType.IdProof.ToString())?.FilePath,
+                             MedicalDegreeCertificate = s == null ? "" : s.FirstOrDefault(d => d.DocumentType == DocumentType.MedicalDegreeCertificate.ToString())?.FilePath,
+                             PostgraduateMedicalDegreeCertificate = s == null ? "" : s.FirstOrDefault(d => d.DocumentType == DocumentType.PostgraduateMedicalDegreeCertificate.ToString())?.FilePath,
+                             SpecializationCertificate = s == null ? "" : s.FirstOrDefault(d => d.DocumentType == DocumentType.SpecializationCertificate.ToString())?.FilePath,
                              Verify = doctor.Verify
                          };
-           
-            return result.ToList();
+            var specializations = _specializationRepo.GetSepcialiazations();
+            var doctor_specailizations = _specializationRepo.GetDoctorSpecialization();
+
+            var query3 = from specialization in specializations
+                        join doctorSpecialization in doctor_specailizations
+                        on specialization.SpecializationId equals doctorSpecialization.SpecializationId
+                        select new
+                        {
+                           DoctorId = doctorSpecialization.DoctorId,
+                           Specialization = specialization.SpecializationName,
+                           Degree = specialization.DegreeName
+                        };
+
+           var result = from doctor in query2 
+                        join specialization in query3
+                        on doctor.DoctorId equals specialization.DoctorId
+                        into ds
+                        from s in ds.DefaultIfEmpty()
+                        select new VerificationDTO
+                        {
+                          
+                            Username = doctor.Username,
+                            ImagePath = doctor.ImagePath,
+                            Name = doctor.Name,
+                            Email = doctor.Email,
+                            Address = doctor.Address,
+                            MedicalLicense = doctor.MedicalLicense,
+                            IdProof =doctor.IdProof,
+                            MedicalDegreeCertificate = doctor.MedicalDegreeCertificate,
+                            PostgraduateMedicalDegreeCertificate = doctor.PostgraduateMedicalDegreeCertificate,
+                            SpecializationCertificate = doctor.SpecializationCertificate,
+                            Verify = doctor.Verify,
+                            Specialization = s == null ? "" : s.Specialization,
+                            Degree = s == null ? "" :s.Degree,
+                        };
+            return result.OrderBy(doctor => doctor.Username).ThenBy(doctor => doctor.Name).ToList();
         }
     }
 }

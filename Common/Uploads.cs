@@ -40,7 +40,7 @@ namespace Common
             if (document != null && document.Length > 0)
             {
                 var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Documents");
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + document.FileName;
+                var uniqueFileName = Guid.NewGuid().ToString();
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))

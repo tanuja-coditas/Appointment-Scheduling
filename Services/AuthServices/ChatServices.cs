@@ -15,10 +15,12 @@ namespace Services.AuthServices
     {
         private readonly ChatRepo _chatRepo;
         private readonly UserRepo _userRepo;
+        private readonly DoctorVerificationRepo _doctorVerificationRepo;
 
-        public ChatServices(ChatRepo chatRepo,UserRepo userRepo) { 
+        public ChatServices(ChatRepo chatRepo,UserRepo userRepo,DoctorVerificationRepo doctorVerificationRepo) { 
             _chatRepo = chatRepo;
             _userRepo = userRepo;
+            _doctorVerificationRepo = doctorVerificationRepo;
         }
 
         public TblChatroom? GetChatRoom(Guid patientId,Guid doctorId)
@@ -106,6 +108,8 @@ namespace Services.AuthServices
             if(role == Roles.patient.ToString())
             {
                 var doctors = _userRepo.GetByRole(Roles.doctor.ToString());
+                var nonVerified = _doctorVerificationRepo.GetNonVerifiedDoctors();
+                doctors = doctors.Where(doctor => !nonVerified.Any(nonVerified => nonVerified.DoctorId == doctor.UserId)).ToList();
                 var chatrooms = _chatRepo.GetChatRooms(user.UserId, role);
                 var doctorsNotInChatrooms = doctors
                                             .Where(doctor => !chatrooms.Any(chatroom => chatroom.DoctorId == doctor.UserId))

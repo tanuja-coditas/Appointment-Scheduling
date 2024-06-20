@@ -14,6 +14,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using NuGet.Common;
 using System;
+using Services.ServiceModels;
+using common;
 namespace AppointmentScheduling.Controllers
 {
     public class AuthController : Controller
@@ -106,7 +108,7 @@ namespace AppointmentScheduling.Controllers
         // POST: AuthController/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel model)
+        public IActionResult Login(LoginModel model)
         {
             if (ModelState.IsValid)
             {
@@ -210,6 +212,7 @@ namespace AppointmentScheduling.Controllers
             TempData["SuccessMessage"] = "Password Updated";
             return View("Login");
         }
+        [NoCache]
         public IActionResult GetLoggedInUser()
         {
             string jwtToken = HttpContext.Request.Cookies["JWTToken"];
@@ -220,10 +223,8 @@ namespace AppointmentScheduling.Controllers
 
             Claim userRole = parsedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             Claim usernameClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "username");
-            Claim imagePathClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "imagePath");
-
             var user = userRepo.GetUser(usernameClaim.Value);
-            var loggedUser = new { UserName = usernameClaim.Value, ImagePath = imagePathClaim.Value, Role = userRole.Value , Name = user.FirstName+" "+user.LastName};
+            var loggedUser = new { UserName = user.UserName, ImagePath = user.UserImage, Role = userRole.Value , Name = user.FirstName+" "+user.LastName};
 
             var options = new JsonSerializerOptions
             {
@@ -234,7 +235,7 @@ namespace AppointmentScheduling.Controllers
             return Ok(json);
         }
 
-
+        [NoCache]
         public IActionResult UserProfile()
         {
 
@@ -245,6 +246,42 @@ namespace AppointmentScheduling.Controllers
 
             var profile = authentication.GetProfile(usernameClaim.Value);
             return View(profile);
+        }
+
+        public IActionResult EditProfile(string username)
+        {
+            var profile = authentication.GetProfile(username);
+            return View(profile);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditProfile(ProfileDTO model)
+        {
+           
+            if (model.ImagePath != null)
+            {
+                string fileExtension = Path.GetExtension(model.ImageFile.FileName);
+                if (fileExtension != ".jpeg" && fileExtension != ".jpg" && fileExtension != ".png")
+                {
+                    ModelState.AddModelError("ImageFile", "Please select a file with .jpeg, .jpg, or .png extension.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
+
+                return View(model);
+            }
+            else
+            {
+                var user = await authentication.UpdateProfile(model);
+                return RedirectToAction("UserProfile");
+            }
+            
         }
         public IActionResult Logout()
         {
